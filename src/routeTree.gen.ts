@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CoachesRouteImport } from './routes/coaches'
 import { Route as AdmissionsRouteImport } from './routes/admissions'
 import { Route as AchievementsRouteImport } from './routes/achievements'
@@ -25,6 +26,11 @@ const ProgramsRoute = ProgramsRouteImport.update({
 const GalleryRoute = GalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CoachesRoute = CoachesRouteImport.update({
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/achievements': typeof AchievementsRoute
   '/admissions': typeof AdmissionsRoute
   '/coaches': typeof CoachesRoute
+  '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/programs': typeof ProgramsRoute
 }
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/achievements': typeof AchievementsRoute
   '/admissions': typeof AdmissionsRoute
   '/coaches': typeof CoachesRoute
+  '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/programs': typeof ProgramsRoute
 }
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/achievements': typeof AchievementsRoute
   '/admissions': typeof AdmissionsRoute
   '/coaches': typeof CoachesRoute
+  '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/programs': typeof ProgramsRoute
 }
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/admissions'
     | '/coaches'
+    | '/contact'
     | '/gallery'
     | '/programs'
   fileRoutesByTo: FileRoutesByTo
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/admissions'
     | '/coaches'
+    | '/contact'
     | '/gallery'
     | '/programs'
   id:
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/admissions'
     | '/coaches'
+    | '/contact'
     | '/gallery'
     | '/programs'
   fileRoutesById: FileRoutesById
@@ -117,6 +129,7 @@ export interface RootRouteChildren {
   AchievementsRoute: typeof AchievementsRoute
   AdmissionsRoute: typeof AdmissionsRoute
   CoachesRoute: typeof CoachesRoute
+  ContactRoute: typeof ContactRoute
   GalleryRoute: typeof GalleryRoute
   ProgramsRoute: typeof ProgramsRoute
 }
@@ -135,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/gallery'
       fullPath: '/gallery'
       preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/coaches': {
@@ -181,6 +201,7 @@ const rootRouteChildren: RootRouteChildren = {
   AchievementsRoute: AchievementsRoute,
   AdmissionsRoute: AdmissionsRoute,
   CoachesRoute: CoachesRoute,
+  ContactRoute: ContactRoute,
   GalleryRoute: GalleryRoute,
   ProgramsRoute: ProgramsRoute,
 }
