@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useAuth } from "@/hooks/useAuth";
 
 const nav = [
   { to: "/programs", label: "Programs" },
@@ -10,6 +11,7 @@ const nav = [
 ] as const;
 
 export function SiteHeader() {
+  const { user } = useAuth();
   return (
     <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -29,12 +31,12 @@ export function SiteHeader() {
           ))}
         </div>
         <div className="flex items-center gap-3">
-          <a
-            href="#student-portal"
+          <Link
+            to={user ? "/portal" : "/auth"}
             className="hidden sm:inline-flex font-mono text-[11px] border border-border px-3 py-1.5 rounded hover:bg-foreground hover:text-background transition-all"
           >
-            STUDENT_PORTAL
-          </a>
+            {user ? "STUDENT_PORTAL" : "SIGN_IN"}
+          </Link>
           <Link
             to="/admissions"
             className="bg-primary text-primary-foreground px-5 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-foreground transition-colors"
