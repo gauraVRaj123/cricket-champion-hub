@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { PageHero } from "@/components/PageHero";
 import coaching from "@/assets/coaching.jpg";
 import batter from "@/assets/hero-batter.jpg";
@@ -19,7 +21,7 @@ export const Route = createFileRoute("/coaches")({
   component: CoachesPage,
 });
 
-const coaches = [
+const fallbackCoaches = [
   {
     name: "Rajesh Kulkarni",
     role: "Head Performance Coach",
@@ -44,6 +46,29 @@ const coaches = [
 ];
 
 function CoachesPage() {
+  const [coaches, setCoaches] = useState(fallbackCoaches);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("coaches")
+        .select("name, role, certifications, bio, photo_url")
+        .eq("active", true)
+        .order("display_order", { ascending: true });
+      if (data && data.length > 0) {
+        setCoaches(
+          data.map((c) => ({
+            name: c.name,
+            role: c.role,
+            cert: c.certifications || "",
+            bio: c.bio || "",
+            img: c.photo_url || coaching,
+          })),
+        );
+      }
+    })();
+  }, []);
+
   return (
     <>
       <PageHero
