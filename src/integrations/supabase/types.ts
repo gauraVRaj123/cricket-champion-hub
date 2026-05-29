@@ -14,6 +14,104 @@ export type Database = {
   }
   public: {
     Tables: {
+      batch_schedules: {
+        Row: {
+          active: boolean
+          age_group: string
+          batch_name: string
+          coach_id: string | null
+          created_at: string
+          days: string
+          display_order: number
+          end_time: string
+          id: string
+          location: string | null
+          notes: string | null
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          age_group: string
+          batch_name: string
+          coach_id?: string | null
+          created_at?: string
+          days: string
+          display_order?: number
+          end_time: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          age_group?: string
+          batch_name?: string
+          coach_id?: string | null
+          created_at?: string
+          days?: string
+          display_order?: number
+          end_time?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batch_schedules_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coaches: {
+        Row: {
+          active: boolean
+          bio: string | null
+          certifications: string | null
+          created_at: string
+          display_order: number
+          experience_years: number | null
+          id: string
+          name: string
+          photo_url: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          bio?: string | null
+          certifications?: string | null
+          created_at?: string
+          display_order?: number
+          experience_years?: number | null
+          id?: string
+          name: string
+          photo_url?: string | null
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          bio?: string | null
+          certifications?: string | null
+          created_at?: string
+          display_order?: number
+          experience_years?: number | null
+          id?: string
+          name?: string
+          photo_url?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
