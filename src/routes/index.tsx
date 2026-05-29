@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import heroBatter from "@/assets/hero-batter.jpg";
 import bowler from "@/assets/bowler.jpg";
 import coaching from "@/assets/coaching.jpg";
@@ -26,7 +28,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const batches = [
+const fallbackBatches = [
   {
     tag: "Morning Elite",
     time: "06:00 — 09:00",
@@ -79,6 +81,29 @@ const testimonials = [
 ];
 
 function Index() {
+  const [batches, setBatches] = useState(fallbackBatches);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("batch_schedules")
+        .select("batch_name, age_group, days, start_time, end_time, notes, display_order")
+        .eq("active", true)
+        .order("display_order", { ascending: true });
+      if (data && data.length > 0) {
+        setBatches(
+          data.map((b, i) => ({
+            tag: b.batch_name,
+            time: `${b.start_time.slice(0, 5)} — ${b.end_time.slice(0, 5)}`,
+            meta: `${b.days} · ${b.age_group}`,
+            price: b.notes || "",
+            dark: i % 3 === 2,
+          })),
+        );
+      }
+    })();
+  }, []);
+
   return (
     <>
       {/* HERO */}
