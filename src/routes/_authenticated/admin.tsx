@@ -24,6 +24,7 @@ type Coach = {
   photo_url: string | null;
   display_order: number;
   active: boolean;
+  user_id: string | null;
 };
 
 type Schedule = {
@@ -121,6 +122,7 @@ function CoachesAdmin() {
     bio: "",
     photo_url: "",
     display_order: "0",
+    user_id: "",
   });
 
   const load = async () => {
@@ -152,13 +154,14 @@ function CoachesAdmin() {
       bio: form.bio.trim() || null,
       photo_url: form.photo_url.trim() || null,
       display_order: Number(form.display_order) || 0,
+      user_id: form.user_id.trim() || null,
     });
     if (error) {
       toast.error(error.message);
       return;
     }
     toast.success("Coach added");
-    setForm({ name: "", role: "", certifications: "", experience_years: "", bio: "", photo_url: "", display_order: "0" });
+    setForm({ name: "", role: "", certifications: "", experience_years: "", bio: "", photo_url: "", display_order: "0", user_id: "" });
     load();
   };
 
@@ -185,6 +188,12 @@ function CoachesAdmin() {
         <Field label="Certifications" value={form.certifications} onChange={(v) => setForm({ ...form, certifications: v })} placeholder="BCCI Level 2" />
         <Field label="Experience (years)" type="number" value={form.experience_years} onChange={(v) => setForm({ ...form, experience_years: v })} />
         <Field label="Photo URL" value={form.photo_url} onChange={(v) => setForm({ ...form, photo_url: v })} placeholder="https://..." />
+        <Field
+          label="Linked user ID (optional)"
+          value={form.user_id}
+          onChange={(v) => setForm({ ...form, user_id: v })}
+          placeholder="auth user UUID — enables coach dashboard"
+        />
         <div className="space-y-2">
           <Label>Bio</Label>
           <textarea
