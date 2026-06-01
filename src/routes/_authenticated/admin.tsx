@@ -42,7 +42,7 @@ type Schedule = {
 
 function AdminPage() {
   const { isAdmin, checking } = useIsAdmin();
-  const [tab, setTab] = useState<"coaches" | "schedules">("coaches");
+  const [tab, setTab] = useState<"coaches" | "schedules" | "users">("coaches");
 
   if (checking) {
     return (
@@ -94,10 +94,18 @@ function AdminPage() {
           >
             SCHEDULES
           </button>
+          <button
+            onClick={() => setTab("users")}
+            className={`px-4 py-2 border ${tab === "users" ? "bg-foreground text-background border-foreground" : "border-border"}`}
+          >
+            USERS
+          </button>
         </div>
       </div>
 
-      {tab === "coaches" ? <CoachesAdmin /> : <SchedulesAdmin />}
+      {tab === "coaches" && <CoachesAdmin />}
+      {tab === "schedules" && <SchedulesAdmin />}
+      {tab === "users" && <UsersAdmin />}
     </div>
   );
 }
