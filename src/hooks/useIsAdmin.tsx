@@ -2,15 +2,17 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
-export function useIsAdmin() {
+type Role = "admin" | "coach" | "student";
+
+function useHasRole(role: Role) {
   const { user, loading } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [has, setHas] = useState(false);
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      setIsAdmin(false);
+      setHas(false);
       setChecking(false);
       return;
     }
@@ -20,17 +22,27 @@ export function useIsAdmin() {
         .from("user_roles")
         .select("role")
         .eq("user_id", user.id)
-        .eq("role", "admin")
+        .eq("role", role)
         .maybeSingle();
       if (!cancelled) {
-        setIsAdmin(!!data);
+        setHas(!!data);
         setChecking(false);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [user, loading]);
+  }, [user, loading, role]);
 
-  return { isAdmin, checking: checking || loading };
+  return { has, checking: checking || loading };
+}
+
+export function useIsAdmin() {
+  const { has, checking } = useHasRole("admin");
+  return { isAdmin: has, checking };
+}
+
+export function useIsCoach() {
+  const { has, checking } = useHasRole("coach");
+  return { isCoach: has, checking };
 }
