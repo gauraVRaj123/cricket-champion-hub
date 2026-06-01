@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRoles } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -70,6 +71,7 @@ const profileSchema = z.object({
 
 function PortalPage() {
   const { user, signOut } = useAuth();
+  const { isAdmin, isCoach, isStudent, checking } = useUserRoles();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [docs, setDocs] = useState<DocRow[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -91,6 +93,43 @@ function PortalPage() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
+
+  if (checking) {
+    return (
+      <div className="py-32 text-center font-mono text-xs uppercase tracking-widest text-muted-foreground">
+        Checking access…
+      </div>
+    );
+  }
+
+  if (!isStudent && (isAdmin || isCoach)) {
+    return (
+      <div className="max-w-2xl mx-auto py-32 px-6 text-center">
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-primary mb-3">
+          [ 403 ]
+        </div>
+        <h1 className="font-display text-5xl mb-4">Wrong dashboard</h1>
+        <p className="text-muted-foreground">
+          The student portal is for student accounts. Head to your dashboard instead.
+        </p>
+        <div className="mt-8 flex flex-wrap justify-center gap-4 font-mono text-xs">
+          {isAdmin && (
+            <Link to="/admin" className="underline underline-offset-4">
+              → Admin dashboard
+            </Link>
+          )}
+          {isCoach && (
+            <Link to="/coach" className="underline underline-offset-4">
+              → Coach dashboard
+            </Link>
+          )}
+          <Link to="/" className="underline underline-offset-4 text-muted-foreground">
+            ← Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   async function saveProfile(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

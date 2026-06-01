@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useUserRoles } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +42,7 @@ type Schedule = {
 };
 
 function AdminPage() {
-  const { isAdmin, checking } = useIsAdmin();
+  const { isAdmin, isCoach, isStudent, checking } = useUserRoles();
   const [tab, setTab] = useState<"coaches" | "schedules" | "users">("coaches");
 
   if (checking) {
@@ -63,12 +63,21 @@ function AdminPage() {
         <p className="text-muted-foreground">
           You need an admin role to access this page. Ask the academy owner to promote your account.
         </p>
-        <Link
-          to="/portal"
-          className="inline-block mt-8 font-mono text-xs underline underline-offset-4"
-        >
-          ← Back to portal
-        </Link>
+        <div className="mt-8 flex flex-wrap justify-center gap-4 font-mono text-xs">
+          {isCoach && (
+            <Link to="/coach" className="underline underline-offset-4">
+              → Coach dashboard
+            </Link>
+          )}
+          {isStudent && (
+            <Link to="/portal" className="underline underline-offset-4">
+              → Student portal
+            </Link>
+          )}
+          <Link to="/" className="underline underline-offset-4 text-muted-foreground">
+            ← Home
+          </Link>
+        </div>
       </div>
     );
   }
@@ -81,6 +90,14 @@ function AdminPage() {
             [ ADMIN ]
           </div>
           <h1 className="font-display text-5xl mt-2">Academy Control</h1>
+          {isCoach && (
+            <Link
+              to="/coach"
+              className="inline-block mt-3 font-mono text-[11px] underline underline-offset-4 text-muted-foreground hover:text-primary"
+            >
+              → Go to coach dashboard
+            </Link>
+          )}
         </div>
         <div className="flex gap-2 font-mono text-xs">
           <button

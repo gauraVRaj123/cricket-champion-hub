@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useIsCoach } from "@/hooks/useIsAdmin";
+import { useUserRoles } from "@/hooks/useIsAdmin";
 
 export const Route = createFileRoute("/_authenticated/coach")({
   head: () => ({ meta: [{ title: "Coach Dashboard · Stump & Stride" }] }),
@@ -30,7 +30,7 @@ type Schedule = {
 };
 
 function CoachPage() {
-  const { isCoach, checking } = useIsCoach();
+  const { isCoach, isAdmin, isStudent, checking } = useUserRoles();
   const [coach, setCoach] = useState<Coach | null>(null);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,9 +75,21 @@ function CoachPage() {
         <p className="text-muted-foreground">
           Your account doesn't have a coach role. Ask the academy admin to grant access.
         </p>
-        <Link to="/portal" className="inline-block mt-8 font-mono text-xs underline underline-offset-4">
-          ← Back to portal
-        </Link>
+        <div className="mt-8 flex flex-wrap justify-center gap-4 font-mono text-xs">
+          {isAdmin && (
+            <Link to="/admin" className="underline underline-offset-4">
+              → Admin dashboard
+            </Link>
+          )}
+          {isStudent && (
+            <Link to="/portal" className="underline underline-offset-4">
+              → Student portal
+            </Link>
+          )}
+          <Link to="/" className="underline underline-offset-4 text-muted-foreground">
+            ← Home
+          </Link>
+        </div>
       </div>
     );
   }
@@ -88,6 +100,14 @@ function CoachPage() {
       <h1 className="font-display text-5xl mt-2 mb-2">
         {coach ? coach.name : "Coach Dashboard"}
       </h1>
+      {isAdmin && (
+        <Link
+          to="/admin"
+          className="inline-block mb-6 font-mono text-[11px] underline underline-offset-4 text-muted-foreground hover:text-primary"
+        >
+          → Go to admin dashboard
+        </Link>
+      )}
       {coach && (
         <p className="text-sm text-muted-foreground mb-10">
           {coach.role}{coach.certifications ? ` · ${coach.certifications}` : ""}
