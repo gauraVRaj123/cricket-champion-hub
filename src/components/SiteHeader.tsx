@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useIsAdmin, useIsCoach } from "@/hooks/useIsAdmin";
 
 const nav = [
   { to: "/programs", label: "Programs" },
@@ -14,6 +14,7 @@ const nav = [
 export function SiteHeader() {
   const { user } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { isCoach } = useIsCoach();
   return (
     <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -39,6 +40,14 @@ export function SiteHeader() {
               className="hidden sm:inline-flex font-mono text-[11px] border border-primary text-primary px-3 py-1.5 rounded hover:bg-primary hover:text-primary-foreground transition-all"
             >
               ADMIN
+            </Link>
+          )}
+          {isCoach && (
+            <Link
+              to="/coach"
+              className="hidden sm:inline-flex font-mono text-[11px] border border-primary text-primary px-3 py-1.5 rounded hover:bg-primary hover:text-primary-foreground transition-all"
+            >
+              COACH
             </Link>
           )}
           <Link
