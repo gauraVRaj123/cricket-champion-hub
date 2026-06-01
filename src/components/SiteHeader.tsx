@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
-import { useIsAdmin, useIsCoach } from "@/hooks/useIsAdmin";
+import { useUserRoles } from "@/hooks/useIsAdmin";
 
 const nav = [
   { to: "/programs", label: "Programs" },
@@ -13,8 +13,8 @@ const nav = [
 
 export function SiteHeader() {
   const { user } = useAuth();
-  const { isAdmin } = useIsAdmin();
-  const { isCoach } = useIsCoach();
+  const { isAdmin, isCoach, isStudent, checking } = useUserRoles();
+  const showStudentPortal = isStudent && !isAdmin && !isCoach;
   return (
     <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -34,28 +34,42 @@ export function SiteHeader() {
           ))}
         </div>
         <div className="flex items-center gap-3">
-          {isAdmin && (
+          {!user && (
             <Link
-              to="/admin"
-              className="hidden sm:inline-flex font-mono text-[11px] border border-primary text-primary px-3 py-1.5 rounded hover:bg-primary hover:text-primary-foreground transition-all"
+              to="/auth"
+              className="hidden sm:inline-flex font-mono text-[11px] border border-border px-3 py-1.5 rounded hover:bg-foreground hover:text-background transition-all"
             >
-              ADMIN
+              SIGN_IN
             </Link>
           )}
-          {isCoach && (
-            <Link
-              to="/coach"
-              className="hidden sm:inline-flex font-mono text-[11px] border border-primary text-primary px-3 py-1.5 rounded hover:bg-primary hover:text-primary-foreground transition-all"
-            >
-              COACH
-            </Link>
+          {user && !checking && (
+            <>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="hidden sm:inline-flex font-mono text-[11px] border border-primary text-primary px-3 py-1.5 rounded hover:bg-primary hover:text-primary-foreground transition-all"
+                >
+                  ADMIN
+                </Link>
+              )}
+              {isCoach && (
+                <Link
+                  to="/coach"
+                  className="hidden sm:inline-flex font-mono text-[11px] border border-primary text-primary px-3 py-1.5 rounded hover:bg-primary hover:text-primary-foreground transition-all"
+                >
+                  COACH
+                </Link>
+              )}
+              {showStudentPortal && (
+                <Link
+                  to="/portal"
+                  className="hidden sm:inline-flex font-mono text-[11px] border border-border px-3 py-1.5 rounded hover:bg-foreground hover:text-background transition-all"
+                >
+                  STUDENT_PORTAL
+                </Link>
+              )}
+            </>
           )}
-          <Link
-            to={user ? "/portal" : "/auth"}
-            className="hidden sm:inline-flex font-mono text-[11px] border border-border px-3 py-1.5 rounded hover:bg-foreground hover:text-background transition-all"
-          >
-            {user ? "STUDENT_PORTAL" : "SIGN_IN"}
-          </Link>
           <Link
             to="/admissions"
             className="bg-primary text-primary-foreground px-5 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-foreground transition-colors"
