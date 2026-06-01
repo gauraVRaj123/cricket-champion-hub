@@ -4,45 +4,50 @@ import { useAuth } from "@/hooks/useAuth";
 
 type Role = "admin" | "coach" | "student";
 
-function useHasRole(role: Role) {
+export function useUserRoles() {
   const { user, loading } = useAuth();
-  const [has, setHas] = useState(false);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      setHas(false);
+      setRoles([]);
       setChecking(false);
       return;
     }
     let cancelled = false;
+    setChecking(true);
     (async () => {
       const { data } = await supabase
         .from("user_roles")
         .select("role")
-        .eq("user_id", user.id)
-        .eq("role", role)
-        .maybeSingle();
+        .eq("user_id", user.id);
       if (!cancelled) {
-        setHas(!!data);
+        setRoles(((data ?? []) as { role: Role }[]).map((r) => r.role));
         setChecking(false);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [user, loading, role]);
+  }, [user, loading]);
 
-  return { has, checking: checking || loading };
+  return {
+    roles,
+    isAdmin: roles.includes("admin"),
+    isCoach: roles.includes("coach"),
+    isStudent: roles.includes("student"),
+    checking: checking || loading,
+  };
 }
 
 export function useIsAdmin() {
-  const { has, checking } = useHasRole("admin");
-  return { isAdmin: has, checking };
+  const { isAdmin, checking } = useUserRoles();
+  return { isAdmin, checking };
 }
 
 export function useIsCoach() {
-  const { has, checking } = useHasRole("coach");
-  return { isCoach: has, checking };
+  const { isCoach, checking } = useUserRoles();
+  return { isCoach, checking };
 }
