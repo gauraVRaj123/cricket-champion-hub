@@ -21,6 +21,7 @@ const signupSchema = z.object({
   email: z.string().trim().email().max(255),
   password: z.string().min(8).max(72),
   phone: z.string().trim().min(7).max(20),
+  role: z.enum(["student", "coach", "admin"]),
 });
 
 const loginSchema = z.object({
@@ -35,7 +36,20 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/portal", replace: true });
+    if (loading || !user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
+      const roles = (data ?? []).map((r) => r.role as string);
+      const dest = roles.includes("admin")
+        ? "/admin"
+        : roles.includes("coach")
+        ? "/coach"
+        : "/portal";
+      navigate({ to: dest, replace: true });
+    })();
   }, [user, loading, navigate]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -49,13 +63,14 @@ function AuthPage() {
           email: fd.get("email"),
           password: fd.get("password"),
           phone: fd.get("phone"),
+          role: fd.get("role"),
         });
         const { error } = await supabase.auth.signUp({
           email: parsed.email,
           password: parsed.password,
           options: {
-            emailRedirectTo: `${window.location.origin}/portal`,
-            data: { full_name: parsed.full_name, phone: parsed.phone },
+            emailRedirectTo: `${window.location.origin}/auth`,
+            data: { full_name: parsed.full_name, phone: parsed.phone, role: parsed.role },
           },
         });
         if (error) throw error;
@@ -80,7 +95,7 @@ function AuthPage() {
   async function handleGoogle() {
     setBusy(true);
     const res = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/portal`,
+      redirect_uri: `${window.location.origin}/auth`,
     });
     if (res.error) {
       toast.error(res.error.message ?? "Google sign-in failed");
@@ -116,6 +131,21 @@ function AuthPage() {
             <>
               <Field label="Full name" name="full_name" required />
               <Field label="Phone (WhatsApp)" name="phone" required />
+              <div>
+                <label className="block font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">
+                  I am signing up as
+                </label>
+                <select
+                  name="role"
+                  required
+                  defaultValue="student"
+                  className="w-full bg-background border border-border px-4 py-3 text-sm focus:outline-none focus:border-primary"
+                >
+                  <option value="student">Student</option>
+                  <option value="coach">Coach</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
             </>
           )}
           <Field label="Email" name="email" type="email" required />
