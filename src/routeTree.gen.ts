@@ -22,6 +22,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedCoachIndexRouteImport } from './routes/_authenticated/coach.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminStudentsRouteImport } from './routes/_authenticated/admin.students'
@@ -94,6 +95,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedCoachIndexRoute = AuthenticatedCoachIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedCoachRoute,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -145,7 +151,7 @@ export interface FileRoutesByFullPath {
   '/gallery': typeof GalleryRoute
   '/programs': typeof ProgramsRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
-  '/coach': typeof AuthenticatedCoachRoute
+  '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/portal': typeof AuthenticatedPortalRoute
   '/admin/attendance': typeof AuthenticatedAdminAttendanceRoute
   '/admin/batches': typeof AuthenticatedAdminBatchesRoute
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/coach/': typeof AuthenticatedCoachIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -165,7 +172,6 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/programs': typeof ProgramsRoute
-  '/coach': typeof AuthenticatedCoachRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/admin/attendance': typeof AuthenticatedAdminAttendanceRoute
   '/admin/batches': typeof AuthenticatedAdminBatchesRoute
@@ -174,6 +180,7 @@ export interface FileRoutesByTo {
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/coach': typeof AuthenticatedCoachIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -188,7 +195,7 @@ export interface FileRoutesById {
   '/gallery': typeof GalleryRoute
   '/programs': typeof ProgramsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
-  '/_authenticated/coach': typeof AuthenticatedCoachRoute
+  '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/_authenticated/admin/attendance': typeof AuthenticatedAdminAttendanceRoute
   '/_authenticated/admin/batches': typeof AuthenticatedAdminBatchesRoute
@@ -197,6 +204,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/coach/': typeof AuthenticatedCoachIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -220,6 +228,7 @@ export interface FileRouteTypes {
     | '/admin/students'
     | '/admin/users'
     | '/admin/'
+    | '/coach/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -231,7 +240,6 @@ export interface FileRouteTypes {
     | '/contact'
     | '/gallery'
     | '/programs'
-    | '/coach'
     | '/portal'
     | '/admin/attendance'
     | '/admin/batches'
@@ -240,6 +248,7 @@ export interface FileRouteTypes {
     | '/admin/students'
     | '/admin/users'
     | '/admin'
+    | '/coach'
   id:
     | '__root__'
     | '/'
@@ -262,6 +271,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/students'
     | '/_authenticated/admin/users'
     | '/_authenticated/admin/'
+    | '/_authenticated/coach/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -370,6 +380,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/coach/': {
+      id: '/_authenticated/coach/'
+      path: '/'
+      fullPath: '/coach/'
+      preLoaderRoute: typeof AuthenticatedCoachIndexRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -445,15 +462,26 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedCoachRouteChildren {
+  AuthenticatedCoachIndexRoute: typeof AuthenticatedCoachIndexRoute
+}
+
+const AuthenticatedCoachRouteChildren: AuthenticatedCoachRouteChildren = {
+  AuthenticatedCoachIndexRoute: AuthenticatedCoachIndexRoute,
+}
+
+const AuthenticatedCoachRouteWithChildren =
+  AuthenticatedCoachRoute._addFileChildren(AuthenticatedCoachRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
-  AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
+  AuthenticatedCoachRoute: typeof AuthenticatedCoachRouteWithChildren
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
-  AuthenticatedCoachRoute: AuthenticatedCoachRoute,
+  AuthenticatedCoachRoute: AuthenticatedCoachRouteWithChildren,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
 }
 
