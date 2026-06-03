@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      attendance: {
+        Row: {
+          batch_id: string | null
+          created_at: string
+          id: string
+          marked_by: string | null
+          session_date: string
+          status: string
+          student_id: string
+        }
+        Insert: {
+          batch_id?: string | null
+          created_at?: string
+          id?: string
+          marked_by?: string | null
+          session_date?: string
+          status?: string
+          student_id: string
+        }
+        Update: {
+          batch_id?: string | null
+          created_at?: string
+          id?: string
+          marked_by?: string | null
+          session_date?: string
+          status?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batch_schedules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       batch_schedules: {
         Row: {
           active: boolean
@@ -26,6 +71,7 @@ export type Database = {
           end_time: string
           id: string
           location: string | null
+          monthly_fee: number | null
           notes: string | null
           start_time: string
           updated_at: string
@@ -41,6 +87,7 @@ export type Database = {
           end_time: string
           id?: string
           location?: string | null
+          monthly_fee?: number | null
           notes?: string | null
           start_time: string
           updated_at?: string
@@ -56,6 +103,7 @@ export type Database = {
           end_time?: string
           id?: string
           location?: string | null
+          monthly_fee?: number | null
           notes?: string | null
           start_time?: string
           updated_at?: string
@@ -114,6 +162,92 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      fee_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          fee_month: string
+          id: string
+          method: string | null
+          notes: string | null
+          paid_on: string
+          recorded_by: string | null
+          student_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          fee_month: string
+          id?: string
+          method?: string | null
+          notes?: string | null
+          paid_on?: string
+          recorded_by?: string | null
+          student_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          fee_month?: string
+          id?: string
+          method?: string | null
+          notes?: string | null
+          paid_on?: string
+          recorded_by?: string | null
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fee_payments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      performance_notes: {
+        Row: {
+          coach_id: string | null
+          created_at: string
+          id: string
+          rating: number | null
+          remarks: string | null
+          student_id: string
+        }
+        Insert: {
+          coach_id?: string | null
+          created_at?: string
+          id?: string
+          rating?: number | null
+          remarks?: string | null
+          student_id: string
+        }
+        Update: {
+          coach_id?: string | null
+          created_at?: string
+          id?: string
+          rating?: number | null
+          remarks?: string | null
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_notes_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_notes_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -183,6 +317,65 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      students: {
+        Row: {
+          active: boolean
+          age: number | null
+          batch_id: string | null
+          created_at: string
+          email: string | null
+          id: string
+          joined_on: string
+          monthly_fee: number | null
+          name: string
+          notes: string | null
+          parent_name: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          age?: number | null
+          batch_id?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          joined_on?: string
+          monthly_fee?: number | null
+          name: string
+          notes?: string | null
+          parent_name?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          age?: number | null
+          batch_id?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          joined_on?: string
+          monthly_fee?: number | null
+          name?: string
+          notes?: string | null
+          parent_name?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batch_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trial_bookings: {
         Row: {
