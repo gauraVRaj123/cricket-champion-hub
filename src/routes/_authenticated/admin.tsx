@@ -1,134 +1,50 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useUserRoles } from "@/hooks/useIsAdmin";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { DashboardShell, Forbidden, Checking } from "@/components/DashboardShell";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  head: () => ({
-    meta: [{ title: "Admin · Stump & Stride" }],
-  }),
-  component: AdminPage,
+  head: () => ({ meta: [{ title: "Admin · Stump & Stride" }] }),
+  component: AdminLayout,
 });
 
-type Coach = {
-  id: string;
-  name: string;
-  role: string;
-  certifications: string | null;
-  experience_years: number | null;
-  bio: string | null;
-  photo_url: string | null;
-  display_order: number;
-  active: boolean;
-  user_id: string | null;
-};
+const NAV = [
+  { to: "/admin", label: "Dashboard" },
+  { to: "/admin/students", label: "Students" },
+  { to: "/admin/coaches", label: "Coaches" },
+  { to: "/admin/batches", label: "Batches" },
+  { to: "/admin/attendance", label: "Attendance" },
+  { to: "/admin/fees", label: "Fees" },
+  { to: "/admin/users", label: "Users & Roles" },
+];
 
-type Schedule = {
-  id: string;
-  batch_name: string;
-  age_group: string;
-  days: string;
-  start_time: string;
-  end_time: string;
-  coach_id: string | null;
-  location: string | null;
-  notes: string | null;
-  display_order: number;
-  active: boolean;
-};
-
-function AdminPage() {
+function AdminLayout() {
   const { isAdmin, isCoach, isStudent, checking } = useUserRoles();
-  const [tab, setTab] = useState<"coaches" | "schedules" | "users">("coaches");
-
-  if (checking) {
-    return (
-      <div className="py-32 text-center font-mono text-xs uppercase tracking-widest text-muted-foreground">
-        Checking access…
-      </div>
-    );
-  }
-
+  if (checking) return <Checking />;
   if (!isAdmin) {
     return (
-      <div className="max-w-2xl mx-auto py-32 px-6 text-center">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-primary mb-3">
-          [ 403 ]
-        </div>
-        <h1 className="font-display text-5xl mb-4">Admins only</h1>
-        <p className="text-muted-foreground">
-          You need an admin role to access this page. Ask the academy owner to promote your account.
-        </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-4 font-mono text-xs">
-          {isCoach && (
-            <Link to="/coach" className="underline underline-offset-4">
-              → Coach dashboard
-            </Link>
-          )}
-          {isStudent && (
-            <Link to="/portal" className="underline underline-offset-4">
-              → Student portal
-            </Link>
-          )}
-          <Link to="/" className="underline underline-offset-4 text-muted-foreground">
-            ← Home
-          </Link>
-        </div>
-      </div>
+      <Forbidden
+        role="Admins"
+        links={[
+          ...(isCoach ? [{ to: "/coach", label: "→ Coach dashboard" }] : []),
+          ...(isStudent ? [{ to: "/portal", label: "→ Student portal" }] : []),
+          { to: "/", label: "← Home" },
+        ]}
+      />
     );
   }
-
   return (
-    <div className="max-w-6xl mx-auto px-6 py-16">
-      <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
-        <div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-primary">
-            [ ADMIN ]
-          </div>
-          <h1 className="font-display text-5xl mt-2">Academy Control</h1>
-          {isCoach && (
-            <Link
-              to="/coach"
-              className="inline-block mt-3 font-mono text-[11px] underline underline-offset-4 text-muted-foreground hover:text-primary"
-            >
-              → Go to coach dashboard
-            </Link>
-          )}
-        </div>
-        <div className="flex gap-2 font-mono text-xs">
-          <button
-            onClick={() => setTab("coaches")}
-            className={`px-4 py-2 border ${tab === "coaches" ? "bg-foreground text-background border-foreground" : "border-border"}`}
-          >
-            COACHES
-          </button>
-          <button
-            onClick={() => setTab("schedules")}
-            className={`px-4 py-2 border ${tab === "schedules" ? "bg-foreground text-background border-foreground" : "border-border"}`}
-          >
-            SCHEDULES
-          </button>
-          <button
-            onClick={() => setTab("users")}
-            className={`px-4 py-2 border ${tab === "users" ? "bg-foreground text-background border-foreground" : "border-border"}`}
-          >
-            USERS
-          </button>
-        </div>
-      </div>
-
-      {tab === "coaches" && <CoachesAdmin />}
-      {tab === "schedules" && <SchedulesAdmin />}
-      {tab === "users" && <UsersAdmin />}
-    </div>
+    <DashboardShell role="ADMIN" title="Academy Control" items={NAV}>
+      <Outlet />
+    </DashboardShell>
   );
 }
 
-function CoachesAdmin() {
+// Re-export form helper used by subpages
+export { Field } from "@/components/admin/Field";
+
+// (Original implementations moved to admin.coaches.tsx, admin.batches.tsx, admin.users.tsx)
+// Keep the type definitions usable from subpages via re-export.
+function _unused() {
   const [list, setList] = useState<Coach[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
