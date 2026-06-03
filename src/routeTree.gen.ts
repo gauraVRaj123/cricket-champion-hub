@@ -26,6 +26,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminStudentsRouteImport } from './routes/_authenticated/admin.students'
 import { Route as AuthenticatedAdminCoachesRouteImport } from './routes/_authenticated/admin.coaches'
 import { Route as AuthenticatedAdminBatchesRouteImport } from './routes/_authenticated/admin.batches'
+import { Route as AuthenticatedAdminAttendanceRouteImport } from './routes/_authenticated/admin.attendance'
 
 const ProgramsRoute = ProgramsRouteImport.update({
   id: '/programs',
@@ -114,6 +115,12 @@ const AuthenticatedAdminBatchesRoute =
     path: '/batches',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAttendanceRoute =
+  AuthenticatedAdminAttendanceRouteImport.update({
+    id: '/attendance',
+    path: '/attendance',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/coach': typeof AuthenticatedCoachRoute
   '/portal': typeof AuthenticatedPortalRoute
+  '/admin/attendance': typeof AuthenticatedAdminAttendanceRoute
   '/admin/batches': typeof AuthenticatedAdminBatchesRoute
   '/admin/coaches': typeof AuthenticatedAdminCoachesRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
@@ -145,6 +153,7 @@ export interface FileRoutesByTo {
   '/programs': typeof ProgramsRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/portal': typeof AuthenticatedPortalRoute
+  '/admin/attendance': typeof AuthenticatedAdminAttendanceRoute
   '/admin/batches': typeof AuthenticatedAdminBatchesRoute
   '/admin/coaches': typeof AuthenticatedAdminCoachesRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
@@ -165,6 +174,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/coach': typeof AuthenticatedCoachRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
+  '/_authenticated/admin/attendance': typeof AuthenticatedAdminAttendanceRoute
   '/_authenticated/admin/batches': typeof AuthenticatedAdminBatchesRoute
   '/_authenticated/admin/coaches': typeof AuthenticatedAdminCoachesRoute
   '/_authenticated/admin/students': typeof AuthenticatedAdminStudentsRoute
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/coach'
     | '/portal'
+    | '/admin/attendance'
     | '/admin/batches'
     | '/admin/coaches'
     | '/admin/students'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/programs'
     | '/coach'
     | '/portal'
+    | '/admin/attendance'
     | '/admin/batches'
     | '/admin/coaches'
     | '/admin/students'
@@ -221,6 +233,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/coach'
     | '/_authenticated/portal'
+    | '/_authenticated/admin/attendance'
     | '/_authenticated/admin/batches'
     | '/_authenticated/admin/coaches'
     | '/_authenticated/admin/students'
@@ -361,10 +374,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminBatchesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/attendance': {
+      id: '/_authenticated/admin/attendance'
+      path: '/attendance'
+      fullPath: '/admin/attendance'
+      preLoaderRoute: typeof AuthenticatedAdminAttendanceRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAttendanceRoute: typeof AuthenticatedAdminAttendanceRoute
   AuthenticatedAdminBatchesRoute: typeof AuthenticatedAdminBatchesRoute
   AuthenticatedAdminCoachesRoute: typeof AuthenticatedAdminCoachesRoute
   AuthenticatedAdminStudentsRoute: typeof AuthenticatedAdminStudentsRoute
@@ -372,6 +393,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAttendanceRoute: AuthenticatedAdminAttendanceRoute,
   AuthenticatedAdminBatchesRoute: AuthenticatedAdminBatchesRoute,
   AuthenticatedAdminCoachesRoute: AuthenticatedAdminCoachesRoute,
   AuthenticatedAdminStudentsRoute: AuthenticatedAdminStudentsRoute,
