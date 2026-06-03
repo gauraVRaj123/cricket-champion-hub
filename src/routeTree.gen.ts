@@ -24,6 +24,10 @@ import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCoachIndexRouteImport } from './routes/_authenticated/coach.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedCoachStudentsRouteImport } from './routes/_authenticated/coach.students'
+import { Route as AuthenticatedCoachScheduleRouteImport } from './routes/_authenticated/coach.schedule'
+import { Route as AuthenticatedCoachPerformanceRouteImport } from './routes/_authenticated/coach.performance'
+import { Route as AuthenticatedCoachAttendanceRouteImport } from './routes/_authenticated/coach.attendance'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminStudentsRouteImport } from './routes/_authenticated/admin.students'
 import { Route as AuthenticatedAdminFeesRouteImport } from './routes/_authenticated/admin.fees'
@@ -105,6 +109,30 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedCoachStudentsRoute =
+  AuthenticatedCoachStudentsRouteImport.update({
+    id: '/students',
+    path: '/students',
+    getParentRoute: () => AuthenticatedCoachRoute,
+  } as any)
+const AuthenticatedCoachScheduleRoute =
+  AuthenticatedCoachScheduleRouteImport.update({
+    id: '/schedule',
+    path: '/schedule',
+    getParentRoute: () => AuthenticatedCoachRoute,
+  } as any)
+const AuthenticatedCoachPerformanceRoute =
+  AuthenticatedCoachPerformanceRouteImport.update({
+    id: '/performance',
+    path: '/performance',
+    getParentRoute: () => AuthenticatedCoachRoute,
+  } as any)
+const AuthenticatedCoachAttendanceRoute =
+  AuthenticatedCoachAttendanceRouteImport.update({
+    id: '/attendance',
+    path: '/attendance',
+    getParentRoute: () => AuthenticatedCoachRoute,
+  } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -159,6 +187,10 @@ export interface FileRoutesByFullPath {
   '/admin/fees': typeof AuthenticatedAdminFeesRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/coach/attendance': typeof AuthenticatedCoachAttendanceRoute
+  '/coach/performance': typeof AuthenticatedCoachPerformanceRoute
+  '/coach/schedule': typeof AuthenticatedCoachScheduleRoute
+  '/coach/students': typeof AuthenticatedCoachStudentsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/coach/': typeof AuthenticatedCoachIndexRoute
 }
@@ -179,6 +211,10 @@ export interface FileRoutesByTo {
   '/admin/fees': typeof AuthenticatedAdminFeesRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/coach/attendance': typeof AuthenticatedCoachAttendanceRoute
+  '/coach/performance': typeof AuthenticatedCoachPerformanceRoute
+  '/coach/schedule': typeof AuthenticatedCoachScheduleRoute
+  '/coach/students': typeof AuthenticatedCoachStudentsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/coach': typeof AuthenticatedCoachIndexRoute
 }
@@ -203,6 +239,10 @@ export interface FileRoutesById {
   '/_authenticated/admin/fees': typeof AuthenticatedAdminFeesRoute
   '/_authenticated/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/coach/attendance': typeof AuthenticatedCoachAttendanceRoute
+  '/_authenticated/coach/performance': typeof AuthenticatedCoachPerformanceRoute
+  '/_authenticated/coach/schedule': typeof AuthenticatedCoachScheduleRoute
+  '/_authenticated/coach/students': typeof AuthenticatedCoachStudentsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/coach/': typeof AuthenticatedCoachIndexRoute
 }
@@ -227,6 +267,10 @@ export interface FileRouteTypes {
     | '/admin/fees'
     | '/admin/students'
     | '/admin/users'
+    | '/coach/attendance'
+    | '/coach/performance'
+    | '/coach/schedule'
+    | '/coach/students'
     | '/admin/'
     | '/coach/'
   fileRoutesByTo: FileRoutesByTo
@@ -247,6 +291,10 @@ export interface FileRouteTypes {
     | '/admin/fees'
     | '/admin/students'
     | '/admin/users'
+    | '/coach/attendance'
+    | '/coach/performance'
+    | '/coach/schedule'
+    | '/coach/students'
     | '/admin'
     | '/coach'
   id:
@@ -270,6 +318,10 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/fees'
     | '/_authenticated/admin/students'
     | '/_authenticated/admin/users'
+    | '/_authenticated/coach/attendance'
+    | '/_authenticated/coach/performance'
+    | '/_authenticated/coach/schedule'
+    | '/_authenticated/coach/students'
     | '/_authenticated/admin/'
     | '/_authenticated/coach/'
   fileRoutesById: FileRoutesById
@@ -394,6 +446,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/coach/students': {
+      id: '/_authenticated/coach/students'
+      path: '/students'
+      fullPath: '/coach/students'
+      preLoaderRoute: typeof AuthenticatedCoachStudentsRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
+    '/_authenticated/coach/schedule': {
+      id: '/_authenticated/coach/schedule'
+      path: '/schedule'
+      fullPath: '/coach/schedule'
+      preLoaderRoute: typeof AuthenticatedCoachScheduleRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
+    '/_authenticated/coach/performance': {
+      id: '/_authenticated/coach/performance'
+      path: '/performance'
+      fullPath: '/coach/performance'
+      preLoaderRoute: typeof AuthenticatedCoachPerformanceRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
+    '/_authenticated/coach/attendance': {
+      id: '/_authenticated/coach/attendance'
+      path: '/attendance'
+      fullPath: '/coach/attendance'
+      preLoaderRoute: typeof AuthenticatedCoachAttendanceRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
       path: '/users'
@@ -463,10 +543,18 @@ const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedCoachRouteChildren {
+  AuthenticatedCoachAttendanceRoute: typeof AuthenticatedCoachAttendanceRoute
+  AuthenticatedCoachPerformanceRoute: typeof AuthenticatedCoachPerformanceRoute
+  AuthenticatedCoachScheduleRoute: typeof AuthenticatedCoachScheduleRoute
+  AuthenticatedCoachStudentsRoute: typeof AuthenticatedCoachStudentsRoute
   AuthenticatedCoachIndexRoute: typeof AuthenticatedCoachIndexRoute
 }
 
 const AuthenticatedCoachRouteChildren: AuthenticatedCoachRouteChildren = {
+  AuthenticatedCoachAttendanceRoute: AuthenticatedCoachAttendanceRoute,
+  AuthenticatedCoachPerformanceRoute: AuthenticatedCoachPerformanceRoute,
+  AuthenticatedCoachScheduleRoute: AuthenticatedCoachScheduleRoute,
+  AuthenticatedCoachStudentsRoute: AuthenticatedCoachStudentsRoute,
   AuthenticatedCoachIndexRoute: AuthenticatedCoachIndexRoute,
 }
 
