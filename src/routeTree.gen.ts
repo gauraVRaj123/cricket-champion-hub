@@ -26,10 +26,14 @@ import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedCoachIndexRouteImport } from './routes/_authenticated/coach.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedPortalScheduleRouteImport } from './routes/_authenticated/portal.schedule'
+import { Route as AuthenticatedPortalResourcesRouteImport } from './routes/_authenticated/portal.resources'
 import { Route as AuthenticatedPortalProfileRouteImport } from './routes/_authenticated/portal.profile'
 import { Route as AuthenticatedPortalPerformanceRouteImport } from './routes/_authenticated/portal.performance'
+import { Route as AuthenticatedPortalMessagesRouteImport } from './routes/_authenticated/portal.messages'
+import { Route as AuthenticatedPortalMatchesRouteImport } from './routes/_authenticated/portal.matches'
 import { Route as AuthenticatedPortalFeesRouteImport } from './routes/_authenticated/portal.fees'
 import { Route as AuthenticatedPortalAttendanceRouteImport } from './routes/_authenticated/portal.attendance'
+import { Route as AuthenticatedPortalAchievementsRouteImport } from './routes/_authenticated/portal.achievements'
 import { Route as AuthenticatedCoachStudentsRouteImport } from './routes/_authenticated/coach.students'
 import { Route as AuthenticatedCoachScheduleRouteImport } from './routes/_authenticated/coach.schedule'
 import { Route as AuthenticatedCoachPerformanceRouteImport } from './routes/_authenticated/coach.performance'
@@ -127,6 +131,12 @@ const AuthenticatedPortalScheduleRoute =
     path: '/schedule',
     getParentRoute: () => AuthenticatedPortalRoute,
   } as any)
+const AuthenticatedPortalResourcesRoute =
+  AuthenticatedPortalResourcesRouteImport.update({
+    id: '/resources',
+    path: '/resources',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
 const AuthenticatedPortalProfileRoute =
   AuthenticatedPortalProfileRouteImport.update({
     id: '/profile',
@@ -139,6 +149,18 @@ const AuthenticatedPortalPerformanceRoute =
     path: '/performance',
     getParentRoute: () => AuthenticatedPortalRoute,
   } as any)
+const AuthenticatedPortalMessagesRoute =
+  AuthenticatedPortalMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedPortalMatchesRoute =
+  AuthenticatedPortalMatchesRouteImport.update({
+    id: '/matches',
+    path: '/matches',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
 const AuthenticatedPortalFeesRoute = AuthenticatedPortalFeesRouteImport.update({
   id: '/fees',
   path: '/fees',
@@ -148,6 +170,12 @@ const AuthenticatedPortalAttendanceRoute =
   AuthenticatedPortalAttendanceRouteImport.update({
     id: '/attendance',
     path: '/attendance',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedPortalAchievementsRoute =
+  AuthenticatedPortalAchievementsRouteImport.update({
+    id: '/achievements',
+    path: '/achievements',
     getParentRoute: () => AuthenticatedPortalRoute,
   } as any)
 const AuthenticatedCoachStudentsRoute =
@@ -232,10 +260,14 @@ export interface FileRoutesByFullPath {
   '/coach/performance': typeof AuthenticatedCoachPerformanceRoute
   '/coach/schedule': typeof AuthenticatedCoachScheduleRoute
   '/coach/students': typeof AuthenticatedCoachStudentsRoute
+  '/portal/achievements': typeof AuthenticatedPortalAchievementsRoute
   '/portal/attendance': typeof AuthenticatedPortalAttendanceRoute
   '/portal/fees': typeof AuthenticatedPortalFeesRoute
+  '/portal/matches': typeof AuthenticatedPortalMatchesRoute
+  '/portal/messages': typeof AuthenticatedPortalMessagesRoute
   '/portal/performance': typeof AuthenticatedPortalPerformanceRoute
   '/portal/profile': typeof AuthenticatedPortalProfileRoute
+  '/portal/resources': typeof AuthenticatedPortalResourcesRoute
   '/portal/schedule': typeof AuthenticatedPortalScheduleRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/coach/': typeof AuthenticatedCoachIndexRoute
@@ -261,10 +293,14 @@ export interface FileRoutesByTo {
   '/coach/performance': typeof AuthenticatedCoachPerformanceRoute
   '/coach/schedule': typeof AuthenticatedCoachScheduleRoute
   '/coach/students': typeof AuthenticatedCoachStudentsRoute
+  '/portal/achievements': typeof AuthenticatedPortalAchievementsRoute
   '/portal/attendance': typeof AuthenticatedPortalAttendanceRoute
   '/portal/fees': typeof AuthenticatedPortalFeesRoute
+  '/portal/matches': typeof AuthenticatedPortalMatchesRoute
+  '/portal/messages': typeof AuthenticatedPortalMessagesRoute
   '/portal/performance': typeof AuthenticatedPortalPerformanceRoute
   '/portal/profile': typeof AuthenticatedPortalProfileRoute
+  '/portal/resources': typeof AuthenticatedPortalResourcesRoute
   '/portal/schedule': typeof AuthenticatedPortalScheduleRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/coach': typeof AuthenticatedCoachIndexRoute
@@ -295,10 +331,14 @@ export interface FileRoutesById {
   '/_authenticated/coach/performance': typeof AuthenticatedCoachPerformanceRoute
   '/_authenticated/coach/schedule': typeof AuthenticatedCoachScheduleRoute
   '/_authenticated/coach/students': typeof AuthenticatedCoachStudentsRoute
+  '/_authenticated/portal/achievements': typeof AuthenticatedPortalAchievementsRoute
   '/_authenticated/portal/attendance': typeof AuthenticatedPortalAttendanceRoute
   '/_authenticated/portal/fees': typeof AuthenticatedPortalFeesRoute
+  '/_authenticated/portal/matches': typeof AuthenticatedPortalMatchesRoute
+  '/_authenticated/portal/messages': typeof AuthenticatedPortalMessagesRoute
   '/_authenticated/portal/performance': typeof AuthenticatedPortalPerformanceRoute
   '/_authenticated/portal/profile': typeof AuthenticatedPortalProfileRoute
+  '/_authenticated/portal/resources': typeof AuthenticatedPortalResourcesRoute
   '/_authenticated/portal/schedule': typeof AuthenticatedPortalScheduleRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/coach/': typeof AuthenticatedCoachIndexRoute
@@ -329,10 +369,14 @@ export interface FileRouteTypes {
     | '/coach/performance'
     | '/coach/schedule'
     | '/coach/students'
+    | '/portal/achievements'
     | '/portal/attendance'
     | '/portal/fees'
+    | '/portal/matches'
+    | '/portal/messages'
     | '/portal/performance'
     | '/portal/profile'
+    | '/portal/resources'
     | '/portal/schedule'
     | '/admin/'
     | '/coach/'
@@ -358,10 +402,14 @@ export interface FileRouteTypes {
     | '/coach/performance'
     | '/coach/schedule'
     | '/coach/students'
+    | '/portal/achievements'
     | '/portal/attendance'
     | '/portal/fees'
+    | '/portal/matches'
+    | '/portal/messages'
     | '/portal/performance'
     | '/portal/profile'
+    | '/portal/resources'
     | '/portal/schedule'
     | '/admin'
     | '/coach'
@@ -391,10 +439,14 @@ export interface FileRouteTypes {
     | '/_authenticated/coach/performance'
     | '/_authenticated/coach/schedule'
     | '/_authenticated/coach/students'
+    | '/_authenticated/portal/achievements'
     | '/_authenticated/portal/attendance'
     | '/_authenticated/portal/fees'
+    | '/_authenticated/portal/matches'
+    | '/_authenticated/portal/messages'
     | '/_authenticated/portal/performance'
     | '/_authenticated/portal/profile'
+    | '/_authenticated/portal/resources'
     | '/_authenticated/portal/schedule'
     | '/_authenticated/admin/'
     | '/_authenticated/coach/'
@@ -535,6 +587,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalScheduleRouteImport
       parentRoute: typeof AuthenticatedPortalRoute
     }
+    '/_authenticated/portal/resources': {
+      id: '/_authenticated/portal/resources'
+      path: '/resources'
+      fullPath: '/portal/resources'
+      preLoaderRoute: typeof AuthenticatedPortalResourcesRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
     '/_authenticated/portal/profile': {
       id: '/_authenticated/portal/profile'
       path: '/profile'
@@ -549,6 +608,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalPerformanceRouteImport
       parentRoute: typeof AuthenticatedPortalRoute
     }
+    '/_authenticated/portal/messages': {
+      id: '/_authenticated/portal/messages'
+      path: '/messages'
+      fullPath: '/portal/messages'
+      preLoaderRoute: typeof AuthenticatedPortalMessagesRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/portal/matches': {
+      id: '/_authenticated/portal/matches'
+      path: '/matches'
+      fullPath: '/portal/matches'
+      preLoaderRoute: typeof AuthenticatedPortalMatchesRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
     '/_authenticated/portal/fees': {
       id: '/_authenticated/portal/fees'
       path: '/fees'
@@ -561,6 +634,13 @@ declare module '@tanstack/react-router' {
       path: '/attendance'
       fullPath: '/portal/attendance'
       preLoaderRoute: typeof AuthenticatedPortalAttendanceRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/portal/achievements': {
+      id: '/_authenticated/portal/achievements'
+      path: '/achievements'
+      fullPath: '/portal/achievements'
+      preLoaderRoute: typeof AuthenticatedPortalAchievementsRouteImport
       parentRoute: typeof AuthenticatedPortalRoute
     }
     '/_authenticated/coach/students': {
@@ -679,19 +759,27 @@ const AuthenticatedCoachRouteWithChildren =
   AuthenticatedCoachRoute._addFileChildren(AuthenticatedCoachRouteChildren)
 
 interface AuthenticatedPortalRouteChildren {
+  AuthenticatedPortalAchievementsRoute: typeof AuthenticatedPortalAchievementsRoute
   AuthenticatedPortalAttendanceRoute: typeof AuthenticatedPortalAttendanceRoute
   AuthenticatedPortalFeesRoute: typeof AuthenticatedPortalFeesRoute
+  AuthenticatedPortalMatchesRoute: typeof AuthenticatedPortalMatchesRoute
+  AuthenticatedPortalMessagesRoute: typeof AuthenticatedPortalMessagesRoute
   AuthenticatedPortalPerformanceRoute: typeof AuthenticatedPortalPerformanceRoute
   AuthenticatedPortalProfileRoute: typeof AuthenticatedPortalProfileRoute
+  AuthenticatedPortalResourcesRoute: typeof AuthenticatedPortalResourcesRoute
   AuthenticatedPortalScheduleRoute: typeof AuthenticatedPortalScheduleRoute
   AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
 }
 
 const AuthenticatedPortalRouteChildren: AuthenticatedPortalRouteChildren = {
+  AuthenticatedPortalAchievementsRoute: AuthenticatedPortalAchievementsRoute,
   AuthenticatedPortalAttendanceRoute: AuthenticatedPortalAttendanceRoute,
   AuthenticatedPortalFeesRoute: AuthenticatedPortalFeesRoute,
+  AuthenticatedPortalMatchesRoute: AuthenticatedPortalMatchesRoute,
+  AuthenticatedPortalMessagesRoute: AuthenticatedPortalMessagesRoute,
   AuthenticatedPortalPerformanceRoute: AuthenticatedPortalPerformanceRoute,
   AuthenticatedPortalProfileRoute: AuthenticatedPortalProfileRoute,
+  AuthenticatedPortalResourcesRoute: AuthenticatedPortalResourcesRoute,
   AuthenticatedPortalScheduleRoute: AuthenticatedPortalScheduleRoute,
   AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
 }
