@@ -14,11 +14,12 @@ A user can hold multiple roles. Admin is the highest privilege.
 
 Replace the single hard-coded `STUDENT_PORTAL` / `SIGN_IN` button with role-aware links:
 
-| Signed-out | Student | Coach | Admin |
-|---|---|---|---|
-| `SIGN_IN` | `STUDENT_PORTAL` | `COACH` | `ADMIN` |
+| Signed-out | Student          | Coach   | Admin   |
+| ---------- | ---------------- | ------- | ------- |
+| `SIGN_IN`  | `STUDENT_PORTAL` | `COACH` | `ADMIN` |
 
 Rules:
+
 - If the user has multiple roles, show one link per role (e.g. a coach who is also admin sees both `COACH` and `ADMIN`).
 - `STUDENT_PORTAL` only appears for users whose ONLY role is student (admins/coaches don't need the student portal in the header).
 - While roles are still being checked, render nothing in that slot instead of flashing the wrong link.
@@ -31,6 +32,7 @@ Add a single `useUserRoles()` hook that fetches all roles for the current user i
 ## Admin page (`src/routes/_authenticated/admin.tsx`)
 
 Currently shows a 403 panel for non-admins — keep that. Additional changes:
+
 - While `checking`, show the "Checking access…" state (already there).
 - After the access check, if the user is also a coach, add a small "Go to coach dashboard →" link in the header area so they can switch contexts without using the URL bar.
 
@@ -43,6 +45,7 @@ Currently shows a 403 panel for non-admins — keep that. Additional changes:
 ## Student portal (`src/routes/_authenticated/portal.tsx`)
 
 Currently anyone signed in can reach `/portal`. Tighten it:
+
 - If the user has the `admin` or `coach` role and NOT the `student` role, show a 403-style panel with links to their actual dashboard(s) instead of the student forms.
 - Users who hold `student` (even alongside other roles) keep full access — they may genuinely want to manage their own profile.
 

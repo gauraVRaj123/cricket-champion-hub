@@ -32,7 +32,9 @@ export function DashboardShell({
           {items.map((it) => {
             const active =
               it.to === pathname ||
-              (it.to !== "/admin" && it.to !== "/coach" && it.to !== "/portal" &&
+              (it.to !== "/admin" &&
+                it.to !== "/coach" &&
+                it.to !== "/portal" &&
                 pathname.startsWith(it.to));
             return (
               <Link
@@ -102,7 +104,8 @@ export function Forbidden({
       </div>
       <h1 className="font-display text-5xl mb-4">{role} only</h1>
       <p className="text-muted-foreground">
-        Your account doesn't have this role. Ask the academy admin to grant access.
+        Your account doesn't have this role. Ask the academy admin to grant
+        access.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-4 font-mono text-xs">
         {links.map((l) => (

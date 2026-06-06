@@ -143,19 +143,41 @@
     font-feature-settings: "ss01", "cv11";
   }
 
-  .font-display { font-family: var(--font-display); letter-spacing: -0.01em; }
-  .font-mono { font-family: var(--font-mono); }
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+  }
 
-  ::selection { background: var(--primary); color: var(--primary-foreground); }
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
 }
 
 @keyframes ss-slideUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes ss-lineGrow {
-  from { width: 0; }
-  to { width: 100%; }
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
 }
-.animate-reveal { animation: ss-slideUp 0.8s cubic-bezier(0.19,1,0.22,1) both; }
-.animate-line { animation: ss-lineGrow 1.2s cubic-bezier(0.19,1,0.22,1) both; }
+.animate-reveal {
+  animation: ss-slideUp 0.8s cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+.animate-line {
+  animation: ss-lineGrow 1.2s cubic-bezier(0.19, 1, 0.22, 1) both;
+}

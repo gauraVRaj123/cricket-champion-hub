@@ -1,16 +1,21 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
-import { useAuth } from "@/hooks/useAuth";
+
+// Switched to dummy/local auth (remove Supabase DB dependency)
+import { useDummyAuth } from "@/hooks/useDummyAuth";
 import { toast } from "sonner";
+
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign In · Stump & Stride" },
-      { name: "description", content: "Sign in or create your student account." },
+      {
+        name: "description",
+        content: "Sign in or create your student account.",
+      },
     ],
   }),
   component: AuthPage,
@@ -31,25 +36,15 @@ const loginSchema = z.object({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user, loading, signIn, signUp } = useDummyAuth();
+
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (loading || !user) return;
-    (async () => {
-      const { data } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id);
-      const roles = (data ?? []).map((r) => r.role as string);
-      const dest = roles.includes("admin")
-        ? "/admin"
-        : roles.includes("coach")
-        ? "/coach"
-        : "/portal";
-      navigate({ to: dest, replace: true });
-    })();
+    const dest = user.role === "admin" ? "/admin" : user.role === "coach" ? "/coach" : "/portal";
+    navigate({ to: dest, replace: true });
   }, [user, loading, navigate]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -65,40 +60,30 @@ function AuthPage() {
           phone: fd.get("phone"),
           role: fd.get("role"),
         });
-        const { error } = await supabase.auth.signUp({
+        const { error } = await signUp({
+          full_name: parsed.full_name,
+          phone: parsed.phone,
           email: parsed.email,
           password: parsed.password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth`,
-            data: { full_name: parsed.full_name, phone: parsed.phone, role: parsed.role },
-          },
+          role: parsed.role,
         });
-        if (error) throw error;
-        toast.success("Account created — welcome!");
+
+        if (error) throw new Error(error);
+        toast.success("Account created — welcome! ");
       } else {
         const parsed = loginSchema.parse({
           email: fd.get("email"),
           password: fd.get("password"),
         });
-        const { error } = await supabase.auth.signInWithPassword(parsed);
-        if (error) throw error;
+
+        const { error } = await signIn(parsed);
+        if (error) throw new Error(error);
         toast.success("Signed in");
       }
     } catch (err) {
       const msg = err instanceof z.ZodError ? err.issues[0].message : (err as Error).message;
       toast.error(msg);
     } finally {
-      setBusy(false);
-    }
-  }
-
-  async function handleGoogle() {
-    setBusy(true);
-    const res = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/auth`,
-    });
-    if (res.error) {
-      toast.error(res.error.message ?? "Google sign-in failed");
       setBusy(false);
     }
   }
@@ -113,17 +98,9 @@ function AuthPage() {
           {mode === "signin" ? "Welcome back." : "Create your account."}
         </h1>
 
-        <button
-          type="button"
-          onClick={handleGoogle}
-          disabled={busy}
-          className="w-full border border-border px-4 py-3 text-sm font-semibold hover:bg-foreground hover:text-background transition-colors mb-6"
-        >
-          Continue with Google
-        </button>
-
         <div className="flex items-center gap-3 my-6 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-          <div className="flex-1 h-px bg-border" /> or email <div className="flex-1 h-px bg-border" />
+          <div className="flex-1 h-px bg-border" /> or email{" "}
+          <div className="flex-1 h-px bg-border" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -149,7 +126,13 @@ function AuthPage() {
             </>
           )}
           <Field label="Email" name="email" type="email" required />
-          <Field label="Password" name="password" type="password" required minLength={mode === "signup" ? 8 : 1} />
+          <Field
+            label="Password"
+            name="password"
+            type="password"
+            required
+            minLength={mode === "signup" ? 8 : 1}
+          />
           <button
             type="submit"
             disabled={busy}
@@ -169,7 +152,9 @@ function AuthPage() {
           </button>
         </div>
         <div className="mt-2 text-xs text-muted-foreground">
-          <Link to="/" className="hover:text-primary">← Back to home</Link>
+          <Link to="/" className="hover:text-primary">
+            ← Back to home
+          </Link>
         </div>
       </div>
     </section>

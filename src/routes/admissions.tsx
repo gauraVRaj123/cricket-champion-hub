@@ -23,7 +23,11 @@ function AdmissionsPage() {
     <>
       <PageHero
         eyebrow="[ 04 ] Admissions"
-        title={<>Reserve your <span className="text-primary">trial slot.</span></>}
+        title={
+          <>
+            Reserve your <span className="text-primary">trial slot.</span>
+          </>
+        }
         intro="One free 90-minute trial. We assess, you decide. Slots fill fast in season — pick a date below."
       />
 
@@ -44,7 +48,13 @@ function AdmissionsPage() {
               <Field label="Age" name="age" type="number" required />
               <Field label="Parent / Guardian" name="parent" required />
               <Field label="Phone (WhatsApp)" name="phone" required />
-              <Field label="Email" name="email" type="email" className="sm:col-span-2" required />
+              <Field
+                label="Email"
+                name="email"
+                type="email"
+                className="sm:col-span-2"
+                required
+              />
             </div>
             <div>
               <Label>Preferred batch</Label>

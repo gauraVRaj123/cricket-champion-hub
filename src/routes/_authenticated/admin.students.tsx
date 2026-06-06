@@ -48,7 +48,10 @@ function AdminStudents() {
     setLoading(true);
     const [{ data: s }, { data: b }] = await Promise.all([
       supabase.from("students").select("*").order("name"),
-      supabase.from("batch_schedules").select("id,batch_name,age_group").order("batch_name"),
+      supabase
+        .from("batch_schedules")
+        .select("id,batch_name,age_group")
+        .order("batch_name"),
     ]);
     setList((s ?? []) as Student[]);
     setBatches((b ?? []) as Batch[]);
@@ -97,7 +100,10 @@ function AdminStudents() {
   };
 
   const toggleActive = async (s: Student) => {
-    const { error } = await supabase.from("students").update({ active: !s.active }).eq("id", s.id);
+    const { error } = await supabase
+      .from("students")
+      .update({ active: !s.active })
+      .eq("id", s.id);
     if (error) return toast.error(error.message);
     load();
   };
@@ -115,15 +121,44 @@ function AdminStudents() {
       <PageHeader eyebrow="[ Students ]" title="Students" />
       <div className="grid lg:grid-cols-2 gap-8">
         <form onSubmit={submit} className="space-y-3 border border-border p-6">
-          <h2 className="font-display text-2xl">{editing ? "Edit Student" : "Add Student"}</h2>
-          <Field label="Name" required value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
+          <h2 className="font-display text-2xl">
+            {editing ? "Edit Student" : "Add Student"}
+          </h2>
+          <Field
+            label="Name"
+            required
+            value={form.name}
+            onChange={(v) => setForm({ ...form, name: v })}
+          />
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Age" type="number" value={form.age} onChange={(v) => setForm({ ...form, age: v })} />
-            <Field label="Monthly Fee (₹)" type="number" value={form.monthly_fee} onChange={(v) => setForm({ ...form, monthly_fee: v })} />
+            <Field
+              label="Age"
+              type="number"
+              value={form.age}
+              onChange={(v) => setForm({ ...form, age: v })}
+            />
+            <Field
+              label="Monthly Fee (₹)"
+              type="number"
+              value={form.monthly_fee}
+              onChange={(v) => setForm({ ...form, monthly_fee: v })}
+            />
           </div>
-          <Field label="Parent / Guardian" value={form.parent_name} onChange={(v) => setForm({ ...form, parent_name: v })} />
-          <Field label="Phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
-          <Field label="Email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
+          <Field
+            label="Parent / Guardian"
+            value={form.parent_name}
+            onChange={(v) => setForm({ ...form, parent_name: v })}
+          />
+          <Field
+            label="Phone"
+            value={form.phone}
+            onChange={(v) => setForm({ ...form, phone: v })}
+          />
+          <Field
+            label="Email"
+            value={form.email}
+            onChange={(v) => setForm({ ...form, email: v })}
+          />
           <div className="space-y-2">
             <Label>Batch</Label>
             <select
@@ -146,9 +181,18 @@ function AdminStudents() {
             placeholder="auth user UUID — enables student portal"
           />
           <div className="flex gap-2">
-            <Button type="submit" className="flex-1">{editing ? "Save" : "Add Student"}</Button>
+            <Button type="submit" className="flex-1">
+              {editing ? "Save" : "Add Student"}
+            </Button>
             {editing && (
-              <Button type="button" variant="outline" onClick={() => { setEditing(null); setForm(empty); }}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setEditing(null);
+                  setForm(empty);
+                }}
+              >
                 Cancel
               </Button>
             )}
@@ -156,25 +200,59 @@ function AdminStudents() {
         </form>
 
         <div className="space-y-3">
-          <h2 className="font-display text-2xl">All Students ({list.length})</h2>
+          <h2 className="font-display text-2xl">
+            All Students ({list.length})
+          </h2>
           {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
-          {!loading && list.length === 0 && <p className="text-sm text-muted-foreground">No students yet.</p>}
+          {!loading && list.length === 0 && (
+            <p className="text-sm text-muted-foreground">No students yet.</p>
+          )}
           {list.map((s) => {
             const batch = batches.find((b) => b.id === s.batch_id);
             return (
-              <div key={s.id} className="border border-border p-4 flex justify-between gap-3">
+              <div
+                key={s.id}
+                className="border border-border p-4 flex justify-between gap-3"
+              >
                 <div className="min-w-0">
-                  <div className="font-display text-lg">{s.name}{!s.active && " · HIDDEN"}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {s.age ? `${s.age}y · ` : ""}{batch?.batch_name ?? "No batch"}
+                  <div className="font-display text-lg">
+                    {s.name}
+                    {!s.active && " · HIDDEN"}
                   </div>
-                  <div className="text-xs text-muted-foreground">{s.phone}{s.email ? ` · ${s.email}` : ""}</div>
-                  {s.monthly_fee ? <div className="text-xs">₹{s.monthly_fee}/mo</div> : null}
+                  <div className="text-xs text-muted-foreground">
+                    {s.age ? `${s.age}y · ` : ""}
+                    {batch?.batch_name ?? "No batch"}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {s.phone}
+                    {s.email ? ` · ${s.email}` : ""}
+                  </div>
+                  {s.monthly_fee ? (
+                    <div className="text-xs">₹{s.monthly_fee}/mo</div>
+                  ) : null}
                 </div>
                 <div className="flex flex-col gap-2 shrink-0">
-                  <Button size="sm" variant="outline" onClick={() => startEdit(s)}>Edit</Button>
-                  <Button size="sm" variant="outline" onClick={() => toggleActive(s)}>{s.active ? "Hide" : "Show"}</Button>
-                  <Button size="sm" variant="destructive" onClick={() => remove(s.id)}>Delete</Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => startEdit(s)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => toggleActive(s)}
+                  >
+                    {s.active ? "Hide" : "Show"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => remove(s.id)}
+                  >
+                    Delete
+                  </Button>
                 </div>
               </div>
             );

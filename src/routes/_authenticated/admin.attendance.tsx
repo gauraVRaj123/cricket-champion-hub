@@ -27,13 +27,31 @@ function AdminAttendance() {
     (async () => {
       setLoading(true);
       const [{ data: a }, { data: s }, { data: b }] = await Promise.all([
-        supabase.from("attendance").select("*").eq("session_date", date).order("created_at"),
+        supabase
+          .from("attendance")
+          .select("*")
+          .eq("session_date", date)
+          .order("created_at"),
         supabase.from("students").select("id,name"),
         supabase.from("batch_schedules").select("id,batch_name"),
       ]);
       setRows((a ?? []) as Row[]);
-      setStudents(Object.fromEntries(((s ?? []) as { id: string; name: string }[]).map((x) => [x.id, x.name])));
-      setBatches(Object.fromEntries(((b ?? []) as { id: string; batch_name: string }[]).map((x) => [x.id, x.batch_name])));
+      setStudents(
+        Object.fromEntries(
+          ((s ?? []) as { id: string; name: string }[]).map((x) => [
+            x.id,
+            x.name,
+          ]),
+        ),
+      );
+      setBatches(
+        Object.fromEntries(
+          ((b ?? []) as { id: string; batch_name: string }[]).map((x) => [
+            x.id,
+            x.batch_name,
+          ]),
+        ),
+      );
       setLoading(false);
     })();
   }, [date]);
@@ -47,23 +65,52 @@ function AdminAttendance() {
     <div>
       <PageHeader eyebrow="[ Attendance ]" title="Attendance Log" />
       <div className="flex items-center gap-3 mb-6">
-        <label className="font-mono text-xs uppercase tracking-widest">Date</label>
-        <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="max-w-xs" />
+        <label className="font-mono text-xs uppercase tracking-widest">
+          Date
+        </label>
+        <Input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="max-w-xs"
+        />
       </div>
       <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="border border-border p-4"><div className="text-xs font-mono uppercase text-primary">Present</div><div className="font-display text-3xl">{counts.present ?? 0}</div></div>
-        <div className="border border-border p-4"><div className="text-xs font-mono uppercase text-primary">Late</div><div className="font-display text-3xl">{counts.late ?? 0}</div></div>
-        <div className="border border-border p-4"><div className="text-xs font-mono uppercase text-primary">Absent</div><div className="font-display text-3xl">{counts.absent ?? 0}</div></div>
+        <div className="border border-border p-4">
+          <div className="text-xs font-mono uppercase text-primary">
+            Present
+          </div>
+          <div className="font-display text-3xl">{counts.present ?? 0}</div>
+        </div>
+        <div className="border border-border p-4">
+          <div className="text-xs font-mono uppercase text-primary">Late</div>
+          <div className="font-display text-3xl">{counts.late ?? 0}</div>
+        </div>
+        <div className="border border-border p-4">
+          <div className="text-xs font-mono uppercase text-primary">Absent</div>
+          <div className="font-display text-3xl">{counts.absent ?? 0}</div>
+        </div>
       </div>
 
       {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
-      {!loading && rows.length === 0 && <p className="text-sm text-muted-foreground">No attendance recorded for this date.</p>}
+      {!loading && rows.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          No attendance recorded for this date.
+        </p>
+      )}
       <div className="space-y-2">
         {rows.map((r) => (
-          <div key={r.id} className="border border-border p-3 flex justify-between text-sm">
+          <div
+            key={r.id}
+            className="border border-border p-3 flex justify-between text-sm"
+          >
             <div>
-              <div className="font-display">{students[r.student_id] ?? r.student_id.slice(0, 8)}</div>
-              <div className="text-xs text-muted-foreground">{r.batch_id ? batches[r.batch_id] : "—"}</div>
+              <div className="font-display">
+                {students[r.student_id] ?? r.student_id.slice(0, 8)}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {r.batch_id ? batches[r.batch_id] : "—"}
+              </div>
             </div>
             <div className="font-mono text-xs uppercase tracking-widest self-center">
               {r.status}

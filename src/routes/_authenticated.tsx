@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthDummyCompat as useAuth } from "@/hooks/useAuthDummyCompat";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,

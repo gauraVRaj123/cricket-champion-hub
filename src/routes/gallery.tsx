@@ -11,7 +11,8 @@ export const Route = createFileRoute("/gallery")({
       { title: "Gallery · Stump & Stride" },
       {
         name: "description",
-        content: "Training sessions, match days and academy life at Stump & Stride.",
+        content:
+          "Training sessions, match days and academy life at Stump & Stride.",
       },
     ],
   }),
@@ -32,7 +33,11 @@ function GalleryPage() {
     <>
       <PageHero
         eyebrow="[ 05 ] Gallery"
-        title={<>Inside the <span className="text-primary">grind.</span></>}
+        title={
+          <>
+            Inside the <span className="text-primary">grind.</span>
+          </>
+        }
         intro="Photographs from training, match days and tournament travel."
       />
       <section className="py-16">

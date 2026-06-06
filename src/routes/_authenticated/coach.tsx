@@ -1,6 +1,10 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useUserRoles } from "@/hooks/useIsAdmin";
-import { DashboardShell, Forbidden, Checking } from "@/components/DashboardShell";
+import {
+  DashboardShell,
+  Forbidden,
+  Checking,
+} from "@/components/DashboardShell";
 
 export const Route = createFileRoute("/_authenticated/coach")({
   head: () => ({ meta: [{ title: "Coach Dashboard · Stump & Stride" }] }),

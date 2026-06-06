@@ -7,7 +7,12 @@ export const Route = createFileRoute("/_authenticated/portal/performance")({
   component: MyPerformance,
 });
 
-type Note = { id: string; rating: number | null; remarks: string | null; created_at: string };
+type Note = {
+  id: string;
+  rating: number | null;
+  remarks: string | null;
+  created_at: string;
+};
 
 function MyPerformance() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -16,33 +21,58 @@ function MyPerformance() {
   useEffect(() => {
     (async () => {
       const uid = (await supabase.auth.getUser()).data.user?.id ?? "";
-      const { data: s } = await supabase.from("students").select("id").eq("user_id", uid).maybeSingle();
-      if (!s) { setLoading(false); return; }
-      const { data } = await supabase.from("performance_notes").select("*").eq("student_id", (s as { id: string }).id).order("created_at", { ascending: false });
+      const { data: s } = await supabase
+        .from("students")
+        .select("id")
+        .eq("user_id", uid)
+        .maybeSingle();
+      if (!s) {
+        setLoading(false);
+        return;
+      }
+      const { data } = await supabase
+        .from("performance_notes")
+        .select("*")
+        .eq("student_id", (s as { id: string }).id)
+        .order("created_at", { ascending: false });
       setNotes((data ?? []) as Note[]);
       setLoading(false);
     })();
   }, []);
 
-  const avg = notes.length ? (notes.reduce((s, n) => s + (n.rating ?? 0), 0) / notes.length).toFixed(1) : "—";
+  const avg = notes.length
+    ? (notes.reduce((s, n) => s + (n.rating ?? 0), 0) / notes.length).toFixed(1)
+    : "—";
 
   return (
     <div>
       <PageHeader eyebrow="[ Performance ]" title="My Performance" />
       {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
-      {!loading && notes.length === 0 && <p className="text-sm text-muted-foreground">No performance notes yet.</p>}
+      {!loading && notes.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          No performance notes yet.
+        </p>
+      )}
       {notes.length > 0 && (
         <>
           <div className="border border-border p-6 mb-6 max-w-xs">
-            <div className="text-xs font-mono uppercase text-primary mb-2">Average Rating</div>
-            <div className="font-display text-4xl">{avg} <span className="text-primary text-2xl">★</span></div>
+            <div className="text-xs font-mono uppercase text-primary mb-2">
+              Average Rating
+            </div>
+            <div className="font-display text-4xl">
+              {avg} <span className="text-primary text-2xl">★</span>
+            </div>
           </div>
           <div className="space-y-2">
             {notes.map((n) => (
               <div key={n.id} className="border border-border p-4">
                 <div className="flex justify-between">
-                  <div className="font-mono text-xs text-primary">{"★".repeat(n.rating ?? 0)}</div>
-                  <div className="text-[10px] font-mono text-muted-foreground">{new Date(n.created_at).toLocaleDateString()}</div>
+                  <div className="font-mono text-xs text-primary">
+                    {"★".repeat(n.rating ?? 0)}
+                  </div>
+                  <div className="text-[10px] font-mono text-muted-foreground">
+                    {new Date(n.created_at).toLocaleDateString()}
+                  </div>
                 </div>
                 {n.remarks && <p className="text-sm mt-2">{n.remarks}</p>}
               </div>

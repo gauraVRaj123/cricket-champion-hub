@@ -73,7 +73,11 @@ function CoachesPage() {
     <>
       <PageHero
         eyebrow="[ 03 ] Coaches"
-        title={<>The people <span className="text-primary">in the nets.</span></>}
+        title={
+          <>
+            The people <span className="text-primary">in the nets.</span>
+          </>
+        }
         intro="No celebrity ambassadors. Just working coaches with first-class CVs and the patience to fix what's broken."
       />
       <section className="py-24">
