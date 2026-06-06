@@ -13,11 +13,16 @@ export const Route = createFileRoute("/_authenticated/portal")({
 });
 
 const NAV = [
-  { to: "/portal", label: "Profile" },
+  { to: "/portal", label: "Dashboard" },
+  { to: "/portal/profile", label: "Profile" },
+  { to: "/portal/schedule", label: "Schedule" },
   { to: "/portal/attendance", label: "Attendance" },
   { to: "/portal/performance", label: "Performance" },
+  { to: "/portal/matches", label: "Matches" },
   { to: "/portal/fees", label: "Fees" },
-  { to: "/portal/schedule", label: "Schedule" },
+  { to: "/portal/resources", label: "Resources" },
+  { to: "/portal/messages", label: "Messages" },
+  { to: "/portal/achievements", label: "Achievements" },
 ];
 
 function PortalLayout() {
