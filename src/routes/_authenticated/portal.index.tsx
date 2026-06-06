@@ -1,197 +1,164 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { toast } from "sonner";
-import { z } from "zod";
 import { PageHeader } from "@/components/DashboardShell";
 
 export const Route = createFileRoute("/_authenticated/portal/")({
-  component: PortalProfile,
+  component: StudentDashboard,
 });
 
-const AGE_GROUPS = ["U-12", "U-14", "U-16", "U-19", "Senior"];
-const DOC_TYPES = [
-  { value: "id_proof", label: "ID Proof" },
-  { value: "age_proof", label: "Age Proof" },
-  { value: "medical", label: "Medical" },
-  { value: "photo", label: "Photo" },
-  { value: "other", label: "Other" },
-];
+type Ann = { id: string; title: string; body: string; created_at: string };
+type Match = { id: string; title: string; opponent: string | null; match_date: string; start_time: string | null; location: string | null };
+type Batch = { batch_name: string; days: string; start_time: string; end_time: string; location: string | null } | null;
 
-type Profile = { full_name: string; age: number | null; phone: string | null; parent_name: string | null; address: string | null; preferred_batch: string | null; age_group: string | null };
-type DocRow = { id: string; doc_type: string; file_path: string; file_name: string; uploaded_at: string };
-type Batch = { id: string; batch_name: string; age_group: string };
-
-const profileSchema = z.object({
-  full_name: z.string().trim().min(2).max(80),
-  age: z.number().int().min(5).max(80),
-  phone: z.string().trim().min(7).max(20),
-  parent_name: z.string().trim().min(2).max(80),
-  address: z.string().trim().min(5).max(500),
-  preferred_batch: z.string().min(1),
-  age_group: z.string().min(1),
-});
-
-function PortalProfile() {
+function StudentDashboard() {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [docs, setDocs] = useState<DocRow[]>([]);
-  const [batches, setBatches] = useState<Batch[]>([]);
-  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [fullName, setFullName] = useState("");
+  const [attendancePct, setAttendancePct] = useState<number | null>(null);
+  const [avgRating, setAvgRating] = useState<string>("—");
+  const [feeStatus, setFeeStatus] = useState<"Paid" | "Pending" | "—">("—");
+  const [batch, setBatch] = useState<Batch>(null);
+  const [announcements, setAnnouncements] = useState<Ann[]>([]);
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
-  const load = async () => {
+  useEffect(() => {
     if (!user) return;
-    const [{ data: p }, { data: d }, { data: b }] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-      supabase.from("student_documents").select("*").eq("user_id", user.id).order("uploaded_at", { ascending: false }),
-      supabase.from("batch_schedules").select("id,batch_name,age_group").eq("active", true).order("batch_name"),
-    ]);
-    setProfile(p as Profile | null);
-    setDocs((d ?? []) as DocRow[]);
-    setBatches((b ?? []) as Batch[]);
-  };
+    (async () => {
+      const [{ data: prof }, { data: stu }, { data: anns }, { data: ms }] = await Promise.all([
+        supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+        supabase.from("students").select("id,batch_id,monthly_fee").eq("user_id", user.id).maybeSingle(),
+        supabase.from("announcements").select("id,title,body,created_at").order("created_at", { ascending: false }).limit(3),
+        supabase.from("matches").select("id,title,opponent,match_date,start_time,location").gte("match_date", new Date().toISOString().slice(0, 10)).order("match_date").limit(3),
+      ]);
+      setFullName((prof as { full_name?: string } | null)?.full_name ?? "");
+      setAnnouncements((anns ?? []) as Ann[]);
+      setMatches((ms ?? []) as Match[]);
 
-  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.id]);
-
-  async function saveProfile(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!user) return;
-    setSaving(true);
-    const fd = new FormData(e.currentTarget);
-    try {
-      const parsed = profileSchema.parse({
-        full_name: fd.get("full_name"),
-        age: Number(fd.get("age")),
-        phone: fd.get("phone"),
-        parent_name: fd.get("parent_name"),
-        address: fd.get("address"),
-        preferred_batch: fd.get("preferred_batch"),
-        age_group: fd.get("age_group"),
-      });
-      const { error } = await supabase.from("profiles").update(parsed).eq("id", user.id);
-      if (error) throw error;
-      toast.success("Saved");
-      load();
-    } catch (err) {
-      const msg = err instanceof z.ZodError ? err.issues[0].message : (err as Error).message;
-      toast.error(msg);
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function uploadDoc(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!user) return;
-    const form = e.currentTarget;
-    const fd = new FormData(form);
-    const file = fd.get("file") as File;
-    const doc_type = String(fd.get("doc_type") ?? "");
-    if (!file || file.size === 0) return toast.error("Select a file");
-    if (file.size > 5 * 1024 * 1024) return toast.error("Max 5 MB");
-    const path = `${user.id}/${Date.now()}-${file.name.replace(/[^\w.\-]/g, "_")}`;
-    const { error: upErr } = await supabase.storage.from("student-docs").upload(path, file);
-    if (upErr) return toast.error(upErr.message);
-    const { error: dbErr } = await supabase.from("student_documents").insert({ user_id: user.id, doc_type, file_path: path, file_name: file.name });
-    if (dbErr) return toast.error(dbErr.message);
-    toast.success("Uploaded");
-    form.reset();
-    load();
-  }
-
-  async function viewDoc(path: string) {
-    const { data, error } = await supabase.storage.from("student-docs").createSignedUrl(path, 60);
-    if (error) return toast.error(error.message);
-    window.open(data.signedUrl, "_blank");
-  }
-
-  async function deleteDoc(id: string, path: string) {
-    await supabase.storage.from("student-docs").remove([path]);
-    await supabase.from("student_documents").delete().eq("id", id);
-    toast.success("Deleted");
-    load();
-  }
+      const s = stu as { id: string; batch_id: string | null; monthly_fee: number | null } | null;
+      if (s) {
+        const [{ data: att }, { data: perf }, { data: pays }, { data: b }, { data: unread }] = await Promise.all([
+          supabase.from("attendance").select("status").eq("student_id", s.id).limit(200),
+          supabase.from("performance_notes").select("rating").eq("student_id", s.id),
+          supabase.from("fee_payments").select("fee_month").eq("student_id", s.id),
+          s.batch_id ? supabase.from("batch_schedules").select("batch_name,days,start_time,end_time,location").eq("id", s.batch_id).maybeSingle() : Promise.resolve({ data: null }),
+          supabase.from("messages").select("id", { count: "exact", head: true }).eq("recipient_student_id", s.id).is("read_at", null),
+        ]);
+        const arows = (att ?? []) as { status: string }[];
+        if (arows.length) {
+          const p = arows.filter((r) => r.status === "present").length;
+          setAttendancePct(Math.round((p / arows.length) * 100));
+        }
+        const prows = (perf ?? []) as { rating: number | null }[];
+        if (prows.length) setAvgRating((prows.reduce((a, r) => a + (r.rating ?? 0), 0) / prows.length).toFixed(1));
+        const month = new Date().toISOString().slice(0, 7);
+        const paid = ((pays ?? []) as { fee_month: string }[]).some((p) => p.fee_month.slice(0, 7) === month);
+        setFeeStatus(paid ? "Paid" : "Pending");
+        setBatch(b as Batch);
+        setUnreadMessages((unread as unknown as { count?: number })?.count ?? 0);
+      }
+      setLoading(false);
+    })();
+  }, [user]);
 
   return (
     <div>
-      <PageHeader eyebrow="[ Profile ]" title={`Hi, ${profile?.full_name || user?.email || "there"}`} />
-      <div className="grid lg:grid-cols-2 gap-8">
-        <form onSubmit={saveProfile} className="border border-border p-6 space-y-3">
-          <h2 className="font-display text-2xl">Profile</h2>
-          <PField label="Full name" name="full_name" defaultValue={profile?.full_name ?? ""} required />
-          <div className="grid grid-cols-2 gap-3">
-            <PField label="Age" name="age" type="number" defaultValue={profile?.age ?? ""} required />
-            <PSelect label="Age group" name="age_group" defaultValue={profile?.age_group ?? ""} options={AGE_GROUPS} />
+      <PageHeader eyebrow="[ Dashboard ]" title={`Hi, ${fullName || "there"}`} />
+      {loading ? (
+        <p className="text-sm text-muted-foreground">Loading…</p>
+      ) : (
+        <>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <Stat label="Attendance" value={attendancePct !== null ? `${attendancePct}%` : "—"} />
+            <Stat label="Avg Rating" value={avgRating} suffix="★" />
+            <Stat label="This Month's Fee" value={feeStatus} />
+            <Stat label="Unread Messages" value={unreadMessages} />
           </div>
-          <PField label="Phone" name="phone" defaultValue={profile?.phone ?? ""} required />
-          <PField label="Parent / Guardian" name="parent_name" defaultValue={profile?.parent_name ?? ""} required />
-          <PTextArea label="Address" name="address" defaultValue={profile?.address ?? ""} required />
-          <PSelect label="Preferred batch" name="preferred_batch" defaultValue={profile?.preferred_batch ?? ""} options={batches.map((b) => ({ value: b.batch_name, label: `${b.batch_name} (${b.age_group})` }))} />
-          <button disabled={saving} className="bg-primary text-primary-foreground px-6 py-3 font-bold uppercase tracking-widest text-sm hover:bg-foreground transition-colors disabled:opacity-50 w-full">
-            {saving ? "Saving…" : "Save Profile"}
-          </button>
-        </form>
 
-        <div className="border border-border p-6 space-y-3">
-          <h2 className="font-display text-2xl">Documents</h2>
-          <form onSubmit={uploadDoc} className="space-y-2">
-            <PSelect label="Type" name="doc_type" defaultValue="id_proof" options={DOC_TYPES} />
-            <div>
-              <label className="block font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">File (max 5 MB)</label>
-              <input type="file" name="file" required accept="image/*,application/pdf" className="w-full text-sm file:mr-3 file:px-3 file:py-1.5 file:border-0 file:bg-foreground file:text-background" />
-            </div>
-            <button className="bg-foreground text-background px-4 py-2 text-xs font-bold uppercase tracking-widest">Upload</button>
-          </form>
-          <ul className="divide-y divide-border text-sm">
-            {docs.length === 0 && <li className="py-3 text-muted-foreground">No documents yet.</li>}
-            {docs.map((d) => (
-              <li key={d.id} className="flex justify-between items-center py-2 gap-3">
-                <div className="min-w-0">
-                  <div className="truncate">{d.file_name}</div>
-                  <div className="text-[10px] font-mono uppercase text-muted-foreground">{d.doc_type}</div>
-                </div>
-                <div className="flex gap-2 shrink-0">
-                  <button onClick={() => viewDoc(d.file_path)} className="text-xs underline text-primary">View</button>
-                  <button onClick={() => deleteDoc(d.id, d.file_path)} className="text-xs underline text-muted-foreground">Delete</button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+          <div className="grid lg:grid-cols-2 gap-6">
+            <Card title="Next Training" link={{ to: "/portal/schedule", label: "View schedule →" }}>
+              {batch ? (
+                <>
+                  <div className="font-display text-2xl">{batch.batch_name}</div>
+                  <div className="text-sm text-muted-foreground">{batch.days}</div>
+                  <div className="text-sm">{batch.start_time.slice(0, 5)} – {batch.end_time.slice(0, 5)}</div>
+                  {batch.location && <div className="text-xs text-muted-foreground mt-1">{batch.location}</div>}
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">No batch assigned yet.</p>
+              )}
+            </Card>
+
+            <Card title="Upcoming Matches" link={{ to: "/portal/matches", label: "All matches →" }}>
+              {matches.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No upcoming matches.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {matches.map((m) => (
+                    <li key={m.id} className="text-sm">
+                      <div className="font-semibold">{m.title}{m.opponent ? ` vs ${m.opponent}` : ""}</div>
+                      <div className="text-xs text-muted-foreground">{m.match_date}{m.start_time ? ` · ${m.start_time.slice(0, 5)}` : ""}{m.location ? ` · ${m.location}` : ""}</div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+
+            <Card title="Announcements" link={{ to: "/portal/messages", label: "All →" }}>
+              {announcements.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No announcements.</p>
+              ) : (
+                <ul className="space-y-3">
+                  {announcements.map((a) => (
+                    <li key={a.id}>
+                      <div className="text-sm font-semibold">{a.title}</div>
+                      <div className="text-xs text-muted-foreground line-clamp-2">{a.body}</div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+
+            <Card title="Quick Links">
+              <div className="grid grid-cols-2 gap-2 text-xs font-mono uppercase tracking-widest">
+                <QL to="/portal/profile" label="Profile" />
+                <QL to="/portal/attendance" label="Attendance" />
+                <QL to="/portal/performance" label="Performance" />
+                <QL to="/portal/fees" label="Fees" />
+                <QL to="/portal/resources" label="Resources" />
+                <QL to="/portal/achievements" label="Achievements" />
+              </div>
+            </Card>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function Stat({ label, value, suffix }: { label: string; value: string | number; suffix?: string }) {
+  return (
+    <div className="border border-border p-5">
+      <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary mb-2">{label}</div>
+      <div className="font-display text-3xl">{value}{suffix && <span className="text-primary text-xl ml-1">{suffix}</span>}</div>
+    </div>
+  );
+}
+
+function Card({ title, link, children }: { title: string; link?: { to: string; label: string }; children: React.ReactNode }) {
+  return (
+    <div className="border border-border p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-display text-xl">{title}</h3>
+        {link && <Link to={link.to} className="text-xs font-mono uppercase tracking-widest text-primary hover:underline">{link.label}</Link>}
       </div>
+      {children}
     </div>
   );
 }
 
-function PField({ label, name, type = "text", defaultValue, required }: { label: string; name: string; type?: string; defaultValue?: string | number; required?: boolean }) {
-  return (
-    <div>
-      <label className="block font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">{label}</label>
-      <input type={type} name={name} defaultValue={defaultValue} required={required} maxLength={255} className="w-full bg-background border border-border px-4 py-2 text-sm focus:outline-none focus:border-primary" />
-    </div>
-  );
-}
-function PTextArea({ label, name, defaultValue, required }: { label: string; name: string; defaultValue?: string; required?: boolean }) {
-  return (
-    <div>
-      <label className="block font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">{label}</label>
-      <textarea name={name} defaultValue={defaultValue} required={required} maxLength={500} rows={3} className="w-full bg-background border border-border px-4 py-2 text-sm focus:outline-none focus:border-primary" />
-    </div>
-  );
-}
-function PSelect({ label, name, defaultValue, options }: { label: string; name: string; defaultValue?: string; options: (string | { value: string; label: string })[] }) {
-  return (
-    <div>
-      <label className="block font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">{label}</label>
-      <select name={name} defaultValue={defaultValue} className="w-full bg-background border border-border px-4 py-2 text-sm focus:outline-none focus:border-primary">
-        <option value="" disabled>Select…</option>
-        {options.map((o) => {
-          const v = typeof o === "string" ? o : o.value;
-          const l = typeof o === "string" ? o : o.label;
-          return <option key={v} value={v}>{l}</option>;
-        })}
-      </select>
-    </div>
-  );
+function QL({ to, label }: { to: string; label: string }) {
+  return <Link to={to} className="border border-border px-3 py-2 hover:bg-foreground hover:text-background text-center">{label}</Link>;
 }

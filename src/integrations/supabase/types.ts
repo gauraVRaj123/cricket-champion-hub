@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          awarded_on: string
+          created_at: string
+          description: string | null
+          file_url: string | null
+          id: string
+          kind: string
+          student_id: string
+          title: string
+        }
+        Insert: {
+          awarded_on?: string
+          created_at?: string
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          kind?: string
+          student_id: string
+          title: string
+        }
+        Update: {
+          awarded_on?: string
+          created_at?: string
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          kind?: string
+          student_id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      announcements: {
+        Row: {
+          audience: string
+          body: string
+          created_at: string
+          created_by: string | null
+          id: string
+          title: string
+        }
+        Insert: {
+          audience?: string
+          body: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          title: string
+        }
+        Update: {
+          audience?: string
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       attendance: {
         Row: {
           batch_id: string | null
@@ -207,6 +267,132 @@ export type Database = {
           },
         ]
       }
+      match_performances: {
+        Row: {
+          balls_faced: number | null
+          batting_runs: number | null
+          catches: number | null
+          created_at: string
+          dismissal: string | null
+          fours: number | null
+          id: string
+          match_id: string
+          notes: string | null
+          overs_bowled: number | null
+          runs_conceded: number | null
+          sixes: number | null
+          student_id: string
+          wickets: number | null
+        }
+        Insert: {
+          balls_faced?: number | null
+          batting_runs?: number | null
+          catches?: number | null
+          created_at?: string
+          dismissal?: string | null
+          fours?: number | null
+          id?: string
+          match_id: string
+          notes?: string | null
+          overs_bowled?: number | null
+          runs_conceded?: number | null
+          sixes?: number | null
+          student_id: string
+          wickets?: number | null
+        }
+        Update: {
+          balls_faced?: number | null
+          batting_runs?: number | null
+          catches?: number | null
+          created_at?: string
+          dismissal?: string | null
+          fours?: number | null
+          id?: string
+          match_id?: string
+          notes?: string | null
+          overs_bowled?: number | null
+          runs_conceded?: number | null
+          sixes?: number | null
+          student_id?: string
+          wickets?: number | null
+        }
+        Relationships: []
+      }
+      matches: {
+        Row: {
+          batch_id: string | null
+          created_at: string
+          created_by: string | null
+          format: string
+          id: string
+          location: string | null
+          match_date: string
+          notes: string | null
+          opponent: string | null
+          start_time: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          batch_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          format?: string
+          id?: string
+          location?: string | null
+          match_date: string
+          notes?: string | null
+          opponent?: string | null
+          start_time?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          batch_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          format?: string
+          id?: string
+          location?: string | null
+          match_date?: string
+          notes?: string | null
+          opponent?: string | null
+          start_time?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          read_at: string | null
+          recipient_student_id: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_student_id: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_student_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
       performance_notes: {
         Row: {
           coach_id: string | null
@@ -254,12 +440,17 @@ export type Database = {
           address: string | null
           age: number | null
           age_group: string | null
+          blood_group: string | null
           created_at: string
+          dob: string | null
           email: string | null
+          emergency_contact: string | null
           full_name: string
           id: string
+          medical_info: string | null
           parent_name: string | null
           phone: string | null
+          playing_role: string | null
           preferred_batch: string | null
           updated_at: string
         }
@@ -267,12 +458,17 @@ export type Database = {
           address?: string | null
           age?: number | null
           age_group?: string | null
+          blood_group?: string | null
           created_at?: string
+          dob?: string | null
           email?: string | null
+          emergency_contact?: string | null
           full_name?: string
           id: string
+          medical_info?: string | null
           parent_name?: string | null
           phone?: string | null
+          playing_role?: string | null
           preferred_batch?: string | null
           updated_at?: string
         }
@@ -280,14 +476,49 @@ export type Database = {
           address?: string | null
           age?: number | null
           age_group?: string | null
+          blood_group?: string | null
           created_at?: string
+          dob?: string | null
           email?: string | null
+          emergency_contact?: string | null
           full_name?: string
           id?: string
+          medical_info?: string | null
           parent_name?: string | null
           phone?: string | null
+          playing_role?: string | null
           preferred_batch?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      resources: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          kind: string
+          title: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          kind?: string
+          title: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          kind?: string
+          title?: string
+          url?: string
         }
         Relationships: []
       }
