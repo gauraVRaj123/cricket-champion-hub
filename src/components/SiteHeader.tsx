@@ -18,7 +18,10 @@ export function SiteHeader() {
   return (
     <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Link to="/" className="font-display text-3xl tracking-tighter text-primary">
+        <Link
+          to="/"
+          className="font-display text-3xl tracking-tighter text-primary"
+        >
           STUMP&amp;STRIDE
         </Link>
         <div className="hidden md:flex gap-7 text-xs font-semibold uppercase tracking-[0.18em]">

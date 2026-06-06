@@ -5,7 +5,11 @@ export const Route = createFileRoute("/achievements")({
   head: () => ({
     meta: [
       { title: "Achievements · Stump & Stride" },
-      { name: "description", content: "State, zone and national honors won by Stump & Stride students." },
+      {
+        name: "description",
+        content:
+          "State, zone and national honors won by Stump & Stride students.",
+      },
     ],
   }),
   component: AchievementsPage,
@@ -13,7 +17,11 @@ export const Route = createFileRoute("/achievements")({
 
 const honors = [
   { year: "2024", name: "Rohan Verma", honor: "Ranji Trophy debut · Mumbai" },
-  { year: "2024", name: "Sahil Khan", honor: "IPL net bowler · Mumbai Indians" },
+  {
+    year: "2024",
+    name: "Sahil Khan",
+    honor: "IPL net bowler · Mumbai Indians",
+  },
   { year: "2023", name: "Aditya Shetty", honor: "U-19 India A squad" },
   { year: "2023", name: "Neha Rao", honor: "Maharashtra Women U-19" },
   { year: "2022", name: "Krish Patil", honor: "West Zone U-16" },
@@ -27,7 +35,11 @@ function AchievementsPage() {
     <>
       <PageHero
         eyebrow="[ 06 ] Achievements"
-        title={<>Receipts, not <span className="text-primary">promises.</span></>}
+        title={
+          <>
+            Receipts, not <span className="text-primary">promises.</span>
+          </>
+        }
         intro="A partial list of honors won by Stump & Stride students since 2020."
       />
       <section className="py-24">
@@ -54,7 +66,9 @@ function AchievementsPage() {
                 key={i}
                 className="py-6 flex flex-wrap items-baseline gap-x-8 gap-y-2 hover:bg-card transition-colors px-4"
               >
-                <span className="font-mono text-sm text-primary w-16">{h.year}</span>
+                <span className="font-mono text-sm text-primary w-16">
+                  {h.year}
+                </span>
                 <span className="font-display text-2xl flex-1 min-w-[180px]">
                   {h.name}
                 </span>

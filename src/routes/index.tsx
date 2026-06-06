@@ -87,7 +87,9 @@ function Index() {
     (async () => {
       const { data } = await supabase
         .from("batch_schedules")
-        .select("batch_name, age_group, days, start_time, end_time, notes, display_order")
+        .select(
+          "batch_name, age_group, days, start_time, end_time, notes, display_order",
+        )
         .eq("active", true)
         .order("display_order", { ascending: true });
       if (data && data.length > 0) {
@@ -183,7 +185,9 @@ function Index() {
       <section className="py-24 bg-card">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-end mb-12 flex-wrap gap-4">
-            <h2 className="font-display text-5xl md:text-6xl">Batch Schedules</h2>
+            <h2 className="font-display text-5xl md:text-6xl">
+              Batch Schedules
+            </h2>
             <span className="font-mono text-sm text-muted-foreground">
               [ SEASON_25/26 ]
             </span>
@@ -208,8 +212,7 @@ function Index() {
                 </div>
                 <div className="mt-10 pt-6 border-t border-current/20 flex justify-between items-center">
                   <span className="text-lg font-bold">
-                    {b.price}{" "}
-                    <span className="text-xs opacity-60">/MO</span>
+                    {b.price} <span className="text-xs opacity-60">/MO</span>
                   </span>
                   <Link
                     to="/admissions"
@@ -246,8 +249,8 @@ function Index() {
             </h2>
             <p className="text-muted-foreground text-lg max-w-prose mb-8">
               Our in-house tracker logs batting average, strike rate, bowling
-              figures and fitness scores for every student. Parents log into
-              the portal to follow progress between sessions.
+              figures and fitness scores for every student. Parents log into the
+              portal to follow progress between sessions.
             </p>
             <dl className="grid grid-cols-3 gap-4 mb-8">
               {[

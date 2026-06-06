@@ -32,7 +32,18 @@ function BatchesAdmin() {
   const [list, setList] = useState<Batch[]>([]);
   const [coaches, setCoaches] = useState<Coach[]>([]);
   const [loading, setLoading] = useState(true);
-  const empty = { batch_name: "", age_group: "", days: "", start_time: "06:00", end_time: "09:00", coach_id: "", location: "", notes: "", monthly_fee: "", display_order: "0" };
+  const empty = {
+    batch_name: "",
+    age_group: "",
+    days: "",
+    start_time: "06:00",
+    end_time: "09:00",
+    coach_id: "",
+    location: "",
+    notes: "",
+    monthly_fee: "",
+    display_order: "0",
+  };
   const [form, setForm] = useState(empty);
 
   const load = async () => {
@@ -46,11 +57,14 @@ function BatchesAdmin() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.batch_name.trim() || !form.age_group.trim() || !form.days.trim()) return toast.error("Name, age, days required");
+    if (!form.batch_name.trim() || !form.age_group.trim() || !form.days.trim())
+      return toast.error("Name, age, days required");
     const { error } = await supabase.from("batch_schedules").insert({
       batch_name: form.batch_name.trim(),
       age_group: form.age_group.trim(),
@@ -70,21 +84,30 @@ function BatchesAdmin() {
   };
 
   const toggleActive = async (s: Batch) => {
-    const { error } = await supabase.from("batch_schedules").update({ active: !s.active }).eq("id", s.id);
+    const { error } = await supabase
+      .from("batch_schedules")
+      .update({ active: !s.active })
+      .eq("id", s.id);
     if (error) return toast.error(error.message);
     load();
   };
 
   const remove = async (id: string) => {
     if (!confirm("Delete this batch?")) return;
-    const { error } = await supabase.from("batch_schedules").delete().eq("id", id);
+    const { error } = await supabase
+      .from("batch_schedules")
+      .delete()
+      .eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Deleted");
     load();
   };
 
   const assignCoach = async (batchId: string, coachId: string) => {
-    const { error } = await supabase.from("batch_schedules").update({ coach_id: coachId || null }).eq("id", batchId);
+    const { error } = await supabase
+      .from("batch_schedules")
+      .update({ coach_id: coachId || null })
+      .eq("id", batchId);
     if (error) return toast.error(error.message);
     toast.success("Coach assigned");
     load();
@@ -96,38 +119,109 @@ function BatchesAdmin() {
       <div className="grid lg:grid-cols-2 gap-8">
         <form onSubmit={submit} className="space-y-3 border border-border p-6">
           <h2 className="font-display text-2xl">Create Batch</h2>
-          <Field label="Batch name" required value={form.batch_name} onChange={(v) => setForm({ ...form, batch_name: v })} />
-          <Field label="Age group" required value={form.age_group} onChange={(v) => setForm({ ...form, age_group: v })} placeholder="U-14" />
-          <Field label="Days" required value={form.days} onChange={(v) => setForm({ ...form, days: v })} placeholder="Mon · Wed · Fri" />
+          <Field
+            label="Batch name"
+            required
+            value={form.batch_name}
+            onChange={(v) => setForm({ ...form, batch_name: v })}
+          />
+          <Field
+            label="Age group"
+            required
+            value={form.age_group}
+            onChange={(v) => setForm({ ...form, age_group: v })}
+            placeholder="U-14"
+          />
+          <Field
+            label="Days"
+            required
+            value={form.days}
+            onChange={(v) => setForm({ ...form, days: v })}
+            placeholder="Mon · Wed · Fri"
+          />
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Start" type="time" value={form.start_time} onChange={(v) => setForm({ ...form, start_time: v })} />
-            <Field label="End" type="time" value={form.end_time} onChange={(v) => setForm({ ...form, end_time: v })} />
+            <Field
+              label="Start"
+              type="time"
+              value={form.start_time}
+              onChange={(v) => setForm({ ...form, start_time: v })}
+            />
+            <Field
+              label="End"
+              type="time"
+              value={form.end_time}
+              onChange={(v) => setForm({ ...form, end_time: v })}
+            />
           </div>
           <div className="space-y-2">
             <Label>Assigned coach</Label>
-            <select value={form.coach_id} onChange={(e) => setForm({ ...form, coach_id: e.target.value })} className="w-full h-9 border border-input bg-transparent rounded-md px-3 text-sm">
+            <select
+              value={form.coach_id}
+              onChange={(e) => setForm({ ...form, coach_id: e.target.value })}
+              className="w-full h-9 border border-input bg-transparent rounded-md px-3 text-sm"
+            >
               <option value="">— None —</option>
-              {coaches.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              {coaches.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
             </select>
           </div>
-          <Field label="Location" value={form.location} onChange={(v) => setForm({ ...form, location: v })} />
-          <Field label="Notes" value={form.notes} onChange={(v) => setForm({ ...form, notes: v })} />
-          <Field label="Monthly fee (₹)" type="number" value={form.monthly_fee} onChange={(v) => setForm({ ...form, monthly_fee: v })} />
-          <Field label="Display order" type="number" value={form.display_order} onChange={(v) => setForm({ ...form, display_order: v })} />
-          <Button type="submit" className="w-full">Create</Button>
+          <Field
+            label="Location"
+            value={form.location}
+            onChange={(v) => setForm({ ...form, location: v })}
+          />
+          <Field
+            label="Notes"
+            value={form.notes}
+            onChange={(v) => setForm({ ...form, notes: v })}
+          />
+          <Field
+            label="Monthly fee (₹)"
+            type="number"
+            value={form.monthly_fee}
+            onChange={(v) => setForm({ ...form, monthly_fee: v })}
+          />
+          <Field
+            label="Display order"
+            type="number"
+            value={form.display_order}
+            onChange={(v) => setForm({ ...form, display_order: v })}
+          />
+          <Button type="submit" className="w-full">
+            Create
+          </Button>
         </form>
 
         <div className="space-y-3">
           <h2 className="font-display text-2xl">All Batches ({list.length})</h2>
           {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
           {list.map((s) => (
-            <div key={s.id} className="border border-border p-4 flex justify-between gap-3">
+            <div
+              key={s.id}
+              className="border border-border p-4 flex justify-between gap-3"
+            >
               <div className="min-w-0 flex-1">
-                <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary">{s.age_group}</div>
-                <div className="font-display text-lg">{s.batch_name}{!s.active && " · HIDDEN"}</div>
-                <div className="text-xs">{s.days} · {s.start_time.slice(0, 5)}–{s.end_time.slice(0, 5)}</div>
-                {s.location && <div className="text-xs text-muted-foreground">{s.location}</div>}
-                {s.monthly_fee ? <div className="text-xs">₹{s.monthly_fee}/mo</div> : null}
+                <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary">
+                  {s.age_group}
+                </div>
+                <div className="font-display text-lg">
+                  {s.batch_name}
+                  {!s.active && " · HIDDEN"}
+                </div>
+                <div className="text-xs">
+                  {s.days} · {s.start_time.slice(0, 5)}–{s.end_time.slice(0, 5)}
+                </div>
+                {s.location && (
+                  <div className="text-xs text-muted-foreground">
+                    {s.location}
+                  </div>
+                )}
+                {s.monthly_fee ? (
+                  <div className="text-xs">₹{s.monthly_fee}/mo</div>
+                ) : null}
                 <div className="mt-2">
                   <select
                     value={s.coach_id ?? ""}
@@ -135,13 +229,29 @@ function BatchesAdmin() {
                     className="w-full h-8 border border-input bg-transparent rounded-md px-2 text-xs"
                   >
                     <option value="">— No coach —</option>
-                    {coaches.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    {coaches.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
               <div className="flex flex-col gap-2 shrink-0">
-                <Button size="sm" variant="outline" onClick={() => toggleActive(s)}>{s.active ? "Hide" : "Show"}</Button>
-                <Button size="sm" variant="destructive" onClick={() => remove(s.id)}>Delete</Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => toggleActive(s)}
+                >
+                  {s.active ? "Hide" : "Show"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => remove(s.id)}
+                >
+                  Delete
+                </Button>
               </div>
             </div>
           ))}

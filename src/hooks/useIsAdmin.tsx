@@ -1,37 +1,22 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useEffect, useMemo, useState } from "react";
+import { useDummyAuth } from "@/hooks/useDummyAuth";
 
 type Role = "admin" | "coach" | "student";
 
 export function useUserRoles() {
-  const { user, loading } = useAuth();
-  const [roles, setRoles] = useState<Role[]>([]);
+  const { user, loading } = useDummyAuth();
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    if (loading) return;
-    if (!user) {
-      setRoles([]);
-      setChecking(false);
-      return;
-    }
-    let cancelled = false;
     setChecking(true);
-    (async () => {
-      const { data } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id);
-      if (!cancelled) {
-        setRoles(((data ?? []) as { role: Role }[]).map((r) => r.role));
-        setChecking(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user, loading]);
+    if (!loading) setChecking(false);
+  }, [loading]);
+
+  const roles = useMemo<Role[]>(() => {
+    if (!user) return [];
+    const role = user.role as Role;
+    return role ? [role] : [];
+  }, [user]);
 
   return {
     roles,

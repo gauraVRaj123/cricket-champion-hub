@@ -68,7 +68,11 @@ function ProgramsPage() {
     <>
       <PageHero
         eyebrow="[ 02 ] Programs"
-        title={<>Pick your <span className="text-primary">batch.</span></>}
+        title={
+          <>
+            Pick your <span className="text-primary">batch.</span>
+          </>
+        }
         intro="Four programs, structured by age and intent. Every batch caps at 18 students so every student gets reps with a coach."
       />
 
