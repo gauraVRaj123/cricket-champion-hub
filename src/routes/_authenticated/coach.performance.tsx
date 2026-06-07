@@ -1,101 +1,56 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/DashboardShell";
+import { STUDENTS, type PerfNote } from "@/lib/coachDummy";
 
 export const Route = createFileRoute("/_authenticated/coach/performance")({
   component: CoachPerformance,
 });
 
-type Student = { id: string; name: string };
-type Note = {
-  id: string;
-  student_id: string;
-  rating: number | null;
-  remarks: string | null;
-  created_at: string;
-};
+const KEY = "coach_perf_notes";
 
 function CoachPerformance() {
-  const [coachId, setCoachId] = useState<string>("");
-  const [students, setStudents] = useState<Student[]>([]);
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [form, setForm] = useState({
-    student_id: "",
-    rating: "4",
-    remarks: "",
-  });
-  const [loading, setLoading] = useState(true);
-
-  const load = async () => {
-    setLoading(true);
-    const uid = (await supabase.auth.getUser()).data.user?.id ?? "";
-    const { data: c } = await supabase
-      .from("coaches")
-      .select("id")
-      .eq("user_id", uid)
-      .maybeSingle();
-    if (!c) {
-      setLoading(false);
-      return;
-    }
-    const cid = (c as { id: string }).id;
-    setCoachId(cid);
-    const { data: b } = await supabase
-      .from("batch_schedules")
-      .select("id")
-      .eq("coach_id", cid);
-    const batchIds = (b ?? []).map((x: { id: string }) => x.id);
-    if (batchIds.length) {
-      const [{ data: s }, { data: n }] = await Promise.all([
-        supabase
-          .from("students")
-          .select("id,name")
-          .in("batch_id", batchIds)
-          .order("name"),
-        supabase
-          .from("performance_notes")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(50),
-      ]);
-      setStudents((s ?? []) as Student[]);
-      setNotes((n ?? []) as Note[]);
-    }
-    setLoading(false);
-  };
+  const [notes, setNotes] = useState<PerfNote[]>([]);
+  const [form, setForm] = useState({ student_id: "", rating: "4", remarks: "" });
 
   useEffect(() => {
-    load();
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) setNotes(JSON.parse(raw));
+    } catch { /* ignore */ }
   }, []);
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!form.student_id) return toast.error("Pick a student");
-    const { error } = await supabase.from("performance_notes").insert({
-      student_id: form.student_id,
-      coach_id: coachId,
-      rating: Number(form.rating),
-      remarks: form.remarks.trim() || null,
-    });
-    if (error) return toast.error(error.message);
-    toast.success("Note added");
-    setForm({ student_id: "", rating: "4", remarks: "" });
-    load();
+  const save = (next: PerfNote[]) => {
+    setNotes(next);
+    localStorage.setItem(KEY, JSON.stringify(next));
   };
 
-  const sname = (id: string) =>
-    students.find((s) => s.id === id)?.name ?? id.slice(0, 8);
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!form.student_id) return toast.error("Pick a student");
+    const note: PerfNote = {
+      id: crypto.randomUUID(),
+      student_id: form.student_id,
+      rating: Number(form.rating),
+      remarks: form.remarks.trim(),
+      created_at: new Date().toISOString(),
+    };
+    save([note, ...notes]);
+    setForm({ student_id: "", rating: "4", remarks: "" });
+    toast.success("Note added");
+  };
+
+  const sname = (id: string) => STUDENTS.find((s) => s.id === id)?.name ?? id;
 
   return (
     <div>
-      <PageHeader eyebrow="[ Performance ]" title="Performance Notes" />
+      <PageHeader eyebrow="[ Performance ]" title="Performance Evaluation" />
       <div className="grid lg:grid-cols-2 gap-8">
         <form onSubmit={submit} className="space-y-3 border border-border p-6">
-          <h2 className="font-display text-2xl">Add Note</h2>
+          <h2 className="font-display text-2xl">Add Evaluation</h2>
           <div className="space-y-2">
             <Label>Student *</Label>
             <select
@@ -105,10 +60,8 @@ function CoachPerformance() {
               required
             >
               <option value="">— Select —</option>
-              {students.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
+              {STUDENTS.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
           </div>
@@ -120,9 +73,7 @@ function CoachPerformance() {
               className="w-full h-9 border border-input bg-transparent rounded-md px-3 text-sm"
             >
               {[1, 2, 3, 4, 5].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
+                <option key={n} value={n}>{n}</option>
               ))}
             </select>
           </div>
@@ -135,27 +86,22 @@ function CoachPerformance() {
               className="w-full border border-input bg-transparent rounded-md px-3 py-2 text-sm"
             />
           </div>
-          <Button type="submit" className="w-full">
-            Add Note
-          </Button>
+          <Button type="submit" className="w-full">Add Note</Button>
         </form>
-
         <div>
           <h2 className="font-display text-2xl mb-3">Recent Notes</h2>
-          {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
+          {notes.length === 0 && (
+            <p className="text-sm text-muted-foreground">No notes yet.</p>
+          )}
           <div className="space-y-2">
             {notes.map((n) => (
               <div key={n.id} className="border border-border p-3 text-sm">
                 <div className="flex justify-between">
                   <div className="font-display">{sname(n.student_id)}</div>
-                  <div className="font-mono text-xs text-primary">
-                    {"★".repeat(n.rating ?? 0)}
-                  </div>
+                  <div className="font-mono text-xs text-primary">{"★".repeat(n.rating)}</div>
                 </div>
                 {n.remarks && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {n.remarks}
-                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">{n.remarks}</p>
                 )}
                 <div className="text-[10px] font-mono text-muted-foreground mt-1">
                   {new Date(n.created_at).toLocaleDateString()}

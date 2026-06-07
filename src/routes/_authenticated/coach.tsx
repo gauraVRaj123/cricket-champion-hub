@@ -13,9 +13,13 @@ export const Route = createFileRoute("/_authenticated/coach")({
 
 const NAV = [
   { to: "/coach", label: "Dashboard" },
+  { to: "/coach/batches", label: "Batches" },
+  { to: "/coach/today", label: "Today's Sessions" },
   { to: "/coach/students", label: "Students" },
   { to: "/coach/attendance", label: "Attendance" },
   { to: "/coach/performance", label: "Performance" },
+  { to: "/coach/matches", label: "Matches" },
+  { to: "/coach/messages", label: "Messages" },
   { to: "/coach/schedule", label: "Schedule" },
 ];
 
