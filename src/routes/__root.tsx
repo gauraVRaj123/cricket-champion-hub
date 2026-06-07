@@ -12,7 +12,7 @@ import appCss from "../styles.css?url";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
-import { AuthProvider } from "@/hooks/useAuth";
+import { DummyAuthProvider } from "@/hooks/useDummyAuth";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -131,7 +131,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
+      <DummyAuthProvider>
         <div className="min-h-screen flex flex-col bg-background text-foreground">
           <SiteHeader />
           <main className="flex-1">
@@ -141,7 +141,7 @@ function RootComponent() {
           <WhatsAppFab />
           <Toaster />
         </div>
-      </AuthProvider>
+      </DummyAuthProvider>
     </QueryClientProvider>
   );
 }

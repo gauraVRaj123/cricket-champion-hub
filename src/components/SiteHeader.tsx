@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useAuth } from "@/hooks/useAuth";
+import { useDummyAuth } from "@/hooks/useDummyAuth";
 import { useUserRoles } from "@/hooks/useIsAdmin";
 
 const nav = [
@@ -12,7 +12,7 @@ const nav = [
 ] as const;
 
 export function SiteHeader() {
-  const { user } = useAuth();
+  const { user, signOut } = useDummyAuth();
   const { isAdmin, isCoach, isStudent, checking } = useUserRoles();
   const showStudentPortal = isStudent && !isAdmin && !isCoach;
   return (
@@ -71,6 +71,12 @@ export function SiteHeader() {
                   STUDENT_PORTAL
                 </Link>
               )}
+              <button
+                onClick={() => signOut()}
+                className="hidden sm:inline-flex font-mono text-[11px] border border-border px-3 py-1.5 rounded hover:bg-foreground hover:text-background transition-all"
+              >
+                SIGN_OUT
+              </button>
             </>
           )}
           <Link

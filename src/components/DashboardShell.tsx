@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useAuth } from "@/hooks/useAuth";
+import { useDummyAuth } from "@/hooks/useDummyAuth";
 
 export type NavItem = {
   to: string;
@@ -18,7 +18,7 @@ export function DashboardShell({
   items: NavItem[];
   children: ReactNode;
 }) {
-  const { user, signOut } = useAuth();
+  const { user, signOut } = useDummyAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
