@@ -34,6 +34,14 @@ import { Route as AuthenticatedPortalMatchesRouteImport } from './routes/_authen
 import { Route as AuthenticatedPortalFeesRouteImport } from './routes/_authenticated/portal.fees'
 import { Route as AuthenticatedPortalAttendanceRouteImport } from './routes/_authenticated/portal.attendance'
 import { Route as AuthenticatedPortalAchievementsRouteImport } from './routes/_authenticated/portal.achievements'
+import { Route as AuthenticatedCoachTodayRouteImport } from './routes/_authenticated/coach.today'
+import { Route as AuthenticatedCoachStudentsRouteImport } from './routes/_authenticated/coach.students'
+import { Route as AuthenticatedCoachScheduleRouteImport } from './routes/_authenticated/coach.schedule'
+import { Route as AuthenticatedCoachPerformanceRouteImport } from './routes/_authenticated/coach.performance'
+import { Route as AuthenticatedCoachMessagesRouteImport } from './routes/_authenticated/coach.messages'
+import { Route as AuthenticatedCoachMatchesRouteImport } from './routes/_authenticated/coach.matches'
+import { Route as AuthenticatedCoachBatchesRouteImport } from './routes/_authenticated/coach.batches'
+import { Route as AuthenticatedCoachAttendanceRouteImport } from './routes/_authenticated/coach.attendance'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminStudentsRouteImport } from './routes/_authenticated/admin.students'
 import { Route as AuthenticatedAdminFeesRouteImport } from './routes/_authenticated/admin.fees'
@@ -174,6 +182,53 @@ const AuthenticatedPortalAchievementsRoute =
     path: '/achievements',
     getParentRoute: () => AuthenticatedPortalRoute,
   } as any)
+const AuthenticatedCoachTodayRoute = AuthenticatedCoachTodayRouteImport.update({
+  id: '/today',
+  path: '/today',
+  getParentRoute: () => AuthenticatedCoachRoute,
+} as any)
+const AuthenticatedCoachStudentsRoute =
+  AuthenticatedCoachStudentsRouteImport.update({
+    id: '/students',
+    path: '/students',
+    getParentRoute: () => AuthenticatedCoachRoute,
+  } as any)
+const AuthenticatedCoachScheduleRoute =
+  AuthenticatedCoachScheduleRouteImport.update({
+    id: '/schedule',
+    path: '/schedule',
+    getParentRoute: () => AuthenticatedCoachRoute,
+  } as any)
+const AuthenticatedCoachPerformanceRoute =
+  AuthenticatedCoachPerformanceRouteImport.update({
+    id: '/performance',
+    path: '/performance',
+    getParentRoute: () => AuthenticatedCoachRoute,
+  } as any)
+const AuthenticatedCoachMessagesRoute =
+  AuthenticatedCoachMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => AuthenticatedCoachRoute,
+  } as any)
+const AuthenticatedCoachMatchesRoute =
+  AuthenticatedCoachMatchesRouteImport.update({
+    id: '/matches',
+    path: '/matches',
+    getParentRoute: () => AuthenticatedCoachRoute,
+  } as any)
+const AuthenticatedCoachBatchesRoute =
+  AuthenticatedCoachBatchesRouteImport.update({
+    id: '/batches',
+    path: '/batches',
+    getParentRoute: () => AuthenticatedCoachRoute,
+  } as any)
+const AuthenticatedCoachAttendanceRoute =
+  AuthenticatedCoachAttendanceRouteImport.update({
+    id: '/attendance',
+    path: '/attendance',
+    getParentRoute: () => AuthenticatedCoachRoute,
+  } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -228,6 +283,14 @@ export interface FileRoutesByFullPath {
   '/admin/fees': typeof AuthenticatedAdminFeesRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/coach/attendance': typeof AuthenticatedCoachAttendanceRoute
+  '/coach/batches': typeof AuthenticatedCoachBatchesRoute
+  '/coach/matches': typeof AuthenticatedCoachMatchesRoute
+  '/coach/messages': typeof AuthenticatedCoachMessagesRoute
+  '/coach/performance': typeof AuthenticatedCoachPerformanceRoute
+  '/coach/schedule': typeof AuthenticatedCoachScheduleRoute
+  '/coach/students': typeof AuthenticatedCoachStudentsRoute
+  '/coach/today': typeof AuthenticatedCoachTodayRoute
   '/portal/achievements': typeof AuthenticatedPortalAchievementsRoute
   '/portal/attendance': typeof AuthenticatedPortalAttendanceRoute
   '/portal/fees': typeof AuthenticatedPortalFeesRoute
@@ -257,6 +320,14 @@ export interface FileRoutesByTo {
   '/admin/fees': typeof AuthenticatedAdminFeesRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/coach/attendance': typeof AuthenticatedCoachAttendanceRoute
+  '/coach/batches': typeof AuthenticatedCoachBatchesRoute
+  '/coach/matches': typeof AuthenticatedCoachMatchesRoute
+  '/coach/messages': typeof AuthenticatedCoachMessagesRoute
+  '/coach/performance': typeof AuthenticatedCoachPerformanceRoute
+  '/coach/schedule': typeof AuthenticatedCoachScheduleRoute
+  '/coach/students': typeof AuthenticatedCoachStudentsRoute
+  '/coach/today': typeof AuthenticatedCoachTodayRoute
   '/portal/achievements': typeof AuthenticatedPortalAchievementsRoute
   '/portal/attendance': typeof AuthenticatedPortalAttendanceRoute
   '/portal/fees': typeof AuthenticatedPortalFeesRoute
@@ -291,6 +362,14 @@ export interface FileRoutesById {
   '/_authenticated/admin/fees': typeof AuthenticatedAdminFeesRoute
   '/_authenticated/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/coach/attendance': typeof AuthenticatedCoachAttendanceRoute
+  '/_authenticated/coach/batches': typeof AuthenticatedCoachBatchesRoute
+  '/_authenticated/coach/matches': typeof AuthenticatedCoachMatchesRoute
+  '/_authenticated/coach/messages': typeof AuthenticatedCoachMessagesRoute
+  '/_authenticated/coach/performance': typeof AuthenticatedCoachPerformanceRoute
+  '/_authenticated/coach/schedule': typeof AuthenticatedCoachScheduleRoute
+  '/_authenticated/coach/students': typeof AuthenticatedCoachStudentsRoute
+  '/_authenticated/coach/today': typeof AuthenticatedCoachTodayRoute
   '/_authenticated/portal/achievements': typeof AuthenticatedPortalAchievementsRoute
   '/_authenticated/portal/attendance': typeof AuthenticatedPortalAttendanceRoute
   '/_authenticated/portal/fees': typeof AuthenticatedPortalFeesRoute
@@ -325,6 +404,14 @@ export interface FileRouteTypes {
     | '/admin/fees'
     | '/admin/students'
     | '/admin/users'
+    | '/coach/attendance'
+    | '/coach/batches'
+    | '/coach/matches'
+    | '/coach/messages'
+    | '/coach/performance'
+    | '/coach/schedule'
+    | '/coach/students'
+    | '/coach/today'
     | '/portal/achievements'
     | '/portal/attendance'
     | '/portal/fees'
@@ -354,6 +441,14 @@ export interface FileRouteTypes {
     | '/admin/fees'
     | '/admin/students'
     | '/admin/users'
+    | '/coach/attendance'
+    | '/coach/batches'
+    | '/coach/matches'
+    | '/coach/messages'
+    | '/coach/performance'
+    | '/coach/schedule'
+    | '/coach/students'
+    | '/coach/today'
     | '/portal/achievements'
     | '/portal/attendance'
     | '/portal/fees'
@@ -387,6 +482,14 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/fees'
     | '/_authenticated/admin/students'
     | '/_authenticated/admin/users'
+    | '/_authenticated/coach/attendance'
+    | '/_authenticated/coach/batches'
+    | '/_authenticated/coach/matches'
+    | '/_authenticated/coach/messages'
+    | '/_authenticated/coach/performance'
+    | '/_authenticated/coach/schedule'
+    | '/_authenticated/coach/students'
+    | '/_authenticated/coach/today'
     | '/_authenticated/portal/achievements'
     | '/_authenticated/portal/attendance'
     | '/_authenticated/portal/fees'
@@ -591,6 +694,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalAchievementsRouteImport
       parentRoute: typeof AuthenticatedPortalRoute
     }
+    '/_authenticated/coach/today': {
+      id: '/_authenticated/coach/today'
+      path: '/today'
+      fullPath: '/coach/today'
+      preLoaderRoute: typeof AuthenticatedCoachTodayRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
+    '/_authenticated/coach/students': {
+      id: '/_authenticated/coach/students'
+      path: '/students'
+      fullPath: '/coach/students'
+      preLoaderRoute: typeof AuthenticatedCoachStudentsRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
+    '/_authenticated/coach/schedule': {
+      id: '/_authenticated/coach/schedule'
+      path: '/schedule'
+      fullPath: '/coach/schedule'
+      preLoaderRoute: typeof AuthenticatedCoachScheduleRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
+    '/_authenticated/coach/performance': {
+      id: '/_authenticated/coach/performance'
+      path: '/performance'
+      fullPath: '/coach/performance'
+      preLoaderRoute: typeof AuthenticatedCoachPerformanceRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
+    '/_authenticated/coach/messages': {
+      id: '/_authenticated/coach/messages'
+      path: '/messages'
+      fullPath: '/coach/messages'
+      preLoaderRoute: typeof AuthenticatedCoachMessagesRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
+    '/_authenticated/coach/matches': {
+      id: '/_authenticated/coach/matches'
+      path: '/matches'
+      fullPath: '/coach/matches'
+      preLoaderRoute: typeof AuthenticatedCoachMatchesRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
+    '/_authenticated/coach/batches': {
+      id: '/_authenticated/coach/batches'
+      path: '/batches'
+      fullPath: '/coach/batches'
+      preLoaderRoute: typeof AuthenticatedCoachBatchesRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
+    '/_authenticated/coach/attendance': {
+      id: '/_authenticated/coach/attendance'
+      path: '/attendance'
+      fullPath: '/coach/attendance'
+      preLoaderRoute: typeof AuthenticatedCoachAttendanceRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
       path: '/users'
@@ -660,10 +819,26 @@ const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedCoachRouteChildren {
+  AuthenticatedCoachAttendanceRoute: typeof AuthenticatedCoachAttendanceRoute
+  AuthenticatedCoachBatchesRoute: typeof AuthenticatedCoachBatchesRoute
+  AuthenticatedCoachMatchesRoute: typeof AuthenticatedCoachMatchesRoute
+  AuthenticatedCoachMessagesRoute: typeof AuthenticatedCoachMessagesRoute
+  AuthenticatedCoachPerformanceRoute: typeof AuthenticatedCoachPerformanceRoute
+  AuthenticatedCoachScheduleRoute: typeof AuthenticatedCoachScheduleRoute
+  AuthenticatedCoachStudentsRoute: typeof AuthenticatedCoachStudentsRoute
+  AuthenticatedCoachTodayRoute: typeof AuthenticatedCoachTodayRoute
   AuthenticatedCoachIndexRoute: typeof AuthenticatedCoachIndexRoute
 }
 
 const AuthenticatedCoachRouteChildren: AuthenticatedCoachRouteChildren = {
+  AuthenticatedCoachAttendanceRoute: AuthenticatedCoachAttendanceRoute,
+  AuthenticatedCoachBatchesRoute: AuthenticatedCoachBatchesRoute,
+  AuthenticatedCoachMatchesRoute: AuthenticatedCoachMatchesRoute,
+  AuthenticatedCoachMessagesRoute: AuthenticatedCoachMessagesRoute,
+  AuthenticatedCoachPerformanceRoute: AuthenticatedCoachPerformanceRoute,
+  AuthenticatedCoachScheduleRoute: AuthenticatedCoachScheduleRoute,
+  AuthenticatedCoachStudentsRoute: AuthenticatedCoachStudentsRoute,
+  AuthenticatedCoachTodayRoute: AuthenticatedCoachTodayRoute,
   AuthenticatedCoachIndexRoute: AuthenticatedCoachIndexRoute,
 }
 
@@ -730,13 +905,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
