@@ -34,10 +34,6 @@ import { Route as AuthenticatedPortalMatchesRouteImport } from './routes/_authen
 import { Route as AuthenticatedPortalFeesRouteImport } from './routes/_authenticated/portal.fees'
 import { Route as AuthenticatedPortalAttendanceRouteImport } from './routes/_authenticated/portal.attendance'
 import { Route as AuthenticatedPortalAchievementsRouteImport } from './routes/_authenticated/portal.achievements'
-import { Route as AuthenticatedCoachStudentsRouteImport } from './routes/_authenticated/coach.students'
-import { Route as AuthenticatedCoachScheduleRouteImport } from './routes/_authenticated/coach.schedule'
-import { Route as AuthenticatedCoachPerformanceRouteImport } from './routes/_authenticated/coach.performance'
-import { Route as AuthenticatedCoachAttendanceRouteImport } from './routes/_authenticated/coach.attendance'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminStudentsRouteImport } from './routes/_authenticated/admin.students'
 import { Route as AuthenticatedAdminFeesRouteImport } from './routes/_authenticated/admin.fees'
@@ -178,30 +174,6 @@ const AuthenticatedPortalAchievementsRoute =
     path: '/achievements',
     getParentRoute: () => AuthenticatedPortalRoute,
   } as any)
-const AuthenticatedCoachStudentsRoute =
-  AuthenticatedCoachStudentsRouteImport.update({
-    id: '/students',
-    path: '/students',
-    getParentRoute: () => AuthenticatedCoachRoute,
-  } as any)
-const AuthenticatedCoachScheduleRoute =
-  AuthenticatedCoachScheduleRouteImport.update({
-    id: '/schedule',
-    path: '/schedule',
-    getParentRoute: () => AuthenticatedCoachRoute,
-  } as any)
-const AuthenticatedCoachPerformanceRoute =
-  AuthenticatedCoachPerformanceRouteImport.update({
-    id: '/performance',
-    path: '/performance',
-    getParentRoute: () => AuthenticatedCoachRoute,
-  } as any)
-const AuthenticatedCoachAttendanceRoute =
-  AuthenticatedCoachAttendanceRouteImport.update({
-    id: '/attendance',
-    path: '/attendance',
-    getParentRoute: () => AuthenticatedCoachRoute,
-  } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -256,10 +228,6 @@ export interface FileRoutesByFullPath {
   '/admin/fees': typeof AuthenticatedAdminFeesRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
-  '/coach/attendance': typeof AuthenticatedCoachAttendanceRoute
-  '/coach/performance': typeof AuthenticatedCoachPerformanceRoute
-  '/coach/schedule': typeof AuthenticatedCoachScheduleRoute
-  '/coach/students': typeof AuthenticatedCoachStudentsRoute
   '/portal/achievements': typeof AuthenticatedPortalAchievementsRoute
   '/portal/attendance': typeof AuthenticatedPortalAttendanceRoute
   '/portal/fees': typeof AuthenticatedPortalFeesRoute
@@ -289,10 +257,6 @@ export interface FileRoutesByTo {
   '/admin/fees': typeof AuthenticatedAdminFeesRoute
   '/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
-  '/coach/attendance': typeof AuthenticatedCoachAttendanceRoute
-  '/coach/performance': typeof AuthenticatedCoachPerformanceRoute
-  '/coach/schedule': typeof AuthenticatedCoachScheduleRoute
-  '/coach/students': typeof AuthenticatedCoachStudentsRoute
   '/portal/achievements': typeof AuthenticatedPortalAchievementsRoute
   '/portal/attendance': typeof AuthenticatedPortalAttendanceRoute
   '/portal/fees': typeof AuthenticatedPortalFeesRoute
@@ -327,10 +291,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/fees': typeof AuthenticatedAdminFeesRoute
   '/_authenticated/admin/students': typeof AuthenticatedAdminStudentsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
-  '/_authenticated/coach/attendance': typeof AuthenticatedCoachAttendanceRoute
-  '/_authenticated/coach/performance': typeof AuthenticatedCoachPerformanceRoute
-  '/_authenticated/coach/schedule': typeof AuthenticatedCoachScheduleRoute
-  '/_authenticated/coach/students': typeof AuthenticatedCoachStudentsRoute
   '/_authenticated/portal/achievements': typeof AuthenticatedPortalAchievementsRoute
   '/_authenticated/portal/attendance': typeof AuthenticatedPortalAttendanceRoute
   '/_authenticated/portal/fees': typeof AuthenticatedPortalFeesRoute
@@ -365,10 +325,6 @@ export interface FileRouteTypes {
     | '/admin/fees'
     | '/admin/students'
     | '/admin/users'
-    | '/coach/attendance'
-    | '/coach/performance'
-    | '/coach/schedule'
-    | '/coach/students'
     | '/portal/achievements'
     | '/portal/attendance'
     | '/portal/fees'
@@ -398,10 +354,6 @@ export interface FileRouteTypes {
     | '/admin/fees'
     | '/admin/students'
     | '/admin/users'
-    | '/coach/attendance'
-    | '/coach/performance'
-    | '/coach/schedule'
-    | '/coach/students'
     | '/portal/achievements'
     | '/portal/attendance'
     | '/portal/fees'
@@ -435,10 +387,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/fees'
     | '/_authenticated/admin/students'
     | '/_authenticated/admin/users'
-    | '/_authenticated/coach/attendance'
-    | '/_authenticated/coach/performance'
-    | '/_authenticated/coach/schedule'
-    | '/_authenticated/coach/students'
     | '/_authenticated/portal/achievements'
     | '/_authenticated/portal/attendance'
     | '/_authenticated/portal/fees'
@@ -643,34 +591,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalAchievementsRouteImport
       parentRoute: typeof AuthenticatedPortalRoute
     }
-    '/_authenticated/coach/students': {
-      id: '/_authenticated/coach/students'
-      path: '/students'
-      fullPath: '/coach/students'
-      preLoaderRoute: typeof AuthenticatedCoachStudentsRouteImport
-      parentRoute: typeof AuthenticatedCoachRoute
-    }
-    '/_authenticated/coach/schedule': {
-      id: '/_authenticated/coach/schedule'
-      path: '/schedule'
-      fullPath: '/coach/schedule'
-      preLoaderRoute: typeof AuthenticatedCoachScheduleRouteImport
-      parentRoute: typeof AuthenticatedCoachRoute
-    }
-    '/_authenticated/coach/performance': {
-      id: '/_authenticated/coach/performance'
-      path: '/performance'
-      fullPath: '/coach/performance'
-      preLoaderRoute: typeof AuthenticatedCoachPerformanceRouteImport
-      parentRoute: typeof AuthenticatedCoachRoute
-    }
-    '/_authenticated/coach/attendance': {
-      id: '/_authenticated/coach/attendance'
-      path: '/attendance'
-      fullPath: '/coach/attendance'
-      preLoaderRoute: typeof AuthenticatedCoachAttendanceRouteImport
-      parentRoute: typeof AuthenticatedCoachRoute
-    }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
       path: '/users'
@@ -740,18 +660,10 @@ const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedCoachRouteChildren {
-  AuthenticatedCoachAttendanceRoute: typeof AuthenticatedCoachAttendanceRoute
-  AuthenticatedCoachPerformanceRoute: typeof AuthenticatedCoachPerformanceRoute
-  AuthenticatedCoachScheduleRoute: typeof AuthenticatedCoachScheduleRoute
-  AuthenticatedCoachStudentsRoute: typeof AuthenticatedCoachStudentsRoute
   AuthenticatedCoachIndexRoute: typeof AuthenticatedCoachIndexRoute
 }
 
 const AuthenticatedCoachRouteChildren: AuthenticatedCoachRouteChildren = {
-  AuthenticatedCoachAttendanceRoute: AuthenticatedCoachAttendanceRoute,
-  AuthenticatedCoachPerformanceRoute: AuthenticatedCoachPerformanceRoute,
-  AuthenticatedCoachScheduleRoute: AuthenticatedCoachScheduleRoute,
-  AuthenticatedCoachStudentsRoute: AuthenticatedCoachStudentsRoute,
   AuthenticatedCoachIndexRoute: AuthenticatedCoachIndexRoute,
 }
 
@@ -818,3 +730,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
