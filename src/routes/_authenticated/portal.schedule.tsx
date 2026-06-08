@@ -41,11 +41,12 @@ function MySchedule() {
             {b.location && (
               <div className="text-xs text-muted-foreground mt-1">{b.location}</div>
             )}
-            {b.coaches?.name && (
-              <div className="text-xs mt-2">
-                Coach: <span className="font-semibold">{b.coaches.name}</span>
-              </div>
-            )}
+            <div className="text-xs mt-2">
+              Coach:{" "}
+              <span className="font-semibold">
+                {b.coaches?.name ?? "Unassigned"}
+              </span>
+            </div>
             {b.notes && <div className="text-xs mt-2">{b.notes}</div>}
           </div>
         ))}
