@@ -1,75 +1,55 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/DashboardShell";
+import { fetchActiveBatches, fmtTime, type BatchRow } from "@/lib/batches";
 
 export const Route = createFileRoute("/_authenticated/portal/schedule")({
   component: MySchedule,
 });
 
-type Batch = {
-  id: string;
-  batch_name: string;
-  age_group: string;
-  days: string;
-  start_time: string;
-  end_time: string;
-  location: string | null;
-  notes: string | null;
-};
-
 function MySchedule() {
-  const [batch, setBatch] = useState<Batch | null>(null);
+  const [batches, setBatches] = useState<BatchRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      const uid = (await supabase.auth.getUser()).data.user?.id ?? "";
-      const { data: s } = await supabase
-        .from("students")
-        .select("batch_id")
-        .eq("user_id", uid)
-        .maybeSingle();
-      const batchId = (s as { batch_id: string | null } | null)?.batch_id;
-      if (batchId) {
-        const { data: b } = await supabase
-          .from("batch_schedules")
-          .select("*")
-          .eq("id", batchId)
-          .maybeSingle();
-        setBatch(b as Batch | null);
-      }
+    fetchActiveBatches().then((b) => {
+      setBatches(b);
       setLoading(false);
-    })();
+    });
   }, []);
 
   return (
     <div>
-      <PageHeader eyebrow="[ Schedule ]" title="My Batch Schedule" />
+      <PageHeader eyebrow="[ Schedule ]" title="Training Batches" />
       {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
-      {!loading && !batch && (
+      {!loading && batches.length === 0 && (
         <p className="text-sm text-muted-foreground">
-          You're not assigned to a batch yet.
+          No batches published yet. Check back soon.
         </p>
       )}
-      {batch && (
-        <div className="border border-border p-6 max-w-lg">
-          <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary">
-            {batch.age_group}
-          </div>
-          <div className="font-display text-3xl mt-1">{batch.batch_name}</div>
-          <div className="text-sm mt-2">{batch.days}</div>
-          <div className="text-sm">
-            {batch.start_time.slice(0, 5)} – {batch.end_time.slice(0, 5)}
-          </div>
-          {batch.location && (
-            <div className="text-xs text-muted-foreground mt-1">
-              {batch.location}
+      <div className="grid md:grid-cols-2 gap-4">
+        {batches.map((b) => (
+          <div key={b.id} className="border border-border p-6">
+            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary">
+              {b.age_group}
             </div>
-          )}
-          {batch.notes && <div className="text-xs mt-2">{batch.notes}</div>}
-        </div>
-      )}
+            <div className="font-display text-2xl mt-1">{b.batch_name}</div>
+            <div className="text-sm mt-2">{b.days}</div>
+            <div className="text-sm">
+              {fmtTime(b.start_time)} – {fmtTime(b.end_time)}
+            </div>
+            {b.location && (
+              <div className="text-xs text-muted-foreground mt-1">{b.location}</div>
+            )}
+            {b.coaches?.name && (
+              <div className="text-xs mt-2">
+                Coach: <span className="font-semibold">{b.coaches.name}</span>
+              </div>
+            )}
+            {b.notes && <div className="text-xs mt-2">{b.notes}</div>}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
