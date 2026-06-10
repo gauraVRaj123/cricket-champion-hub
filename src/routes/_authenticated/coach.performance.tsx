@@ -4,50 +4,86 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/DashboardShell";
-import { STUDENTS, type PerfNote } from "@/lib/coachDummy";
+import { supabase } from "@/integrations/supabase/client";
+import { useDummyAuth } from "@/hooks/useDummyAuth";
+import {
+  fetchActiveBatches,
+  filterBatchesForCoach,
+} from "@/lib/batches";
+import { fetchStudentsForBatches, findMyCoach } from "@/lib/me";
 
 export const Route = createFileRoute("/_authenticated/coach/performance")({
   component: CoachPerformance,
 });
 
-const KEY = "coach_perf_notes";
+type Note = {
+  id: string;
+  student_id: string;
+  rating: number | null;
+  remarks: string | null;
+  created_at: string;
+};
+type Student = { id: string; name: string };
 
 function CoachPerformance() {
-  const [notes, setNotes] = useState<PerfNote[]>([]);
+  const { user } = useDummyAuth();
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [coachId, setCoachId] = useState<string | null>(null);
   const [form, setForm] = useState({ student_id: "", rating: "4", remarks: "" });
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) setNotes(JSON.parse(raw));
-    } catch { /* ignore */ }
-  }, []);
+    (async () => {
+      const [all, coach] = await Promise.all([
+        fetchActiveBatches(),
+        findMyCoach(user?.full_name),
+      ]);
+      setCoachId(coach?.id ?? null);
+      const mine = filterBatchesForCoach(all, user?.full_name);
+      const rows = await fetchStudentsForBatches(mine.map((b) => b.id));
+      const studentList = rows.map((r) => ({ id: r.id, name: r.name })) as Student[];
+      setStudents(studentList);
+      if (studentList.length) {
+        const { data } = await supabase
+          .from("performance_notes")
+          .select("*")
+          .in("student_id", studentList.map((s) => s.id))
+          .order("created_at", { ascending: false })
+          .limit(50);
+        setNotes((data ?? []) as Note[]);
+      }
+    })();
+  }, [user?.full_name]);
 
-  const save = (next: PerfNote[]) => {
-    setNotes(next);
-    localStorage.setItem(KEY, JSON.stringify(next));
-  };
-
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!form.student_id) return toast.error("Pick a student");
-    const note: PerfNote = {
-      id: crypto.randomUUID(),
-      student_id: form.student_id,
-      rating: Number(form.rating),
-      remarks: form.remarks.trim(),
-      created_at: new Date().toISOString(),
-    };
-    save([note, ...notes]);
+    const { data, error } = await supabase
+      .from("performance_notes")
+      .insert({
+        student_id: form.student_id,
+        coach_id: coachId,
+        rating: Number(form.rating),
+        remarks: form.remarks.trim() || null,
+      })
+      .select()
+      .single();
+    if (error) return toast.error(error.message);
+    setNotes([data as Note, ...notes]);
     setForm({ student_id: "", rating: "4", remarks: "" });
     toast.success("Note added");
   };
 
-  const sname = (id: string) => STUDENTS.find((s) => s.id === id)?.name ?? id;
+  const sname = (id: string) => students.find((s) => s.id === id)?.name ?? id;
 
   return (
     <div>
       <PageHeader eyebrow="[ Performance ]" title="Performance Evaluation" />
+      {students.length === 0 && (
+        <p className="text-sm text-muted-foreground mb-4">
+          No students in your batches yet.
+        </p>
+      )}
       <div className="grid lg:grid-cols-2 gap-8">
         <form onSubmit={submit} className="space-y-3 border border-border p-6">
           <h2 className="font-display text-2xl">Add Evaluation</h2>
@@ -60,7 +96,7 @@ function CoachPerformance() {
               required
             >
               <option value="">— Select —</option>
-              {STUDENTS.map((s) => (
+              {students.map((s) => (
                 <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
@@ -98,7 +134,9 @@ function CoachPerformance() {
               <div key={n.id} className="border border-border p-3 text-sm">
                 <div className="flex justify-between">
                   <div className="font-display">{sname(n.student_id)}</div>
-                  <div className="font-mono text-xs text-primary">{"★".repeat(n.rating)}</div>
+                  <div className="font-mono text-xs text-primary">
+                    {"★".repeat(n.rating ?? 0)}
+                  </div>
                 </div>
                 {n.remarks && (
                   <p className="text-xs text-muted-foreground mt-1">{n.remarks}</p>
