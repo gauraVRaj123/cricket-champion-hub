@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/DashboardShell";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
+import { findMyStudent } from "@/lib/me";
+import { useDummyAuth } from "@/hooks/useDummyAuth";
 
 export const Route = createFileRoute("/_authenticated/portal/fees")({
   component: MyFees,
@@ -19,6 +21,7 @@ type Payment = {
 };
 
 function MyFees() {
+  const { user } = useDummyAuth();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [monthlyFee, setMonthlyFee] = useState(0);
   const [studentName, setStudentName] = useState("");
@@ -26,17 +29,11 @@ function MyFees() {
 
   useEffect(() => {
     (async () => {
-      const uid = (await supabase.auth.getUser()).data.user?.id ?? "";
-      const { data: s } = await supabase
-        .from("students")
-        .select("id,name,monthly_fee")
-        .eq("user_id", uid)
-        .maybeSingle();
-      if (!s) {
+      const stu = await findMyStudent(user?.email);
+      if (!stu) {
         setLoading(false);
         return;
       }
-      const stu = s as { id: string; name: string; monthly_fee: number | null };
       setMonthlyFee(Number(stu.monthly_fee ?? 0));
       setStudentName(stu.name);
       const { data } = await supabase
@@ -47,7 +44,7 @@ function MyFees() {
       setPayments((data ?? []) as Payment[]);
       setLoading(false);
     })();
-  }, []);
+  }, [user?.email]);
 
   const currentMonth = new Date().toISOString().slice(0, 7);
   const paidThisMonth = payments.some(
