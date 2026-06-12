@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/DashboardShell";
+import { findMyStudent } from "@/lib/me";
+import { useDummyAuth } from "@/hooks/useDummyAuth";
 
 export const Route = createFileRoute("/_authenticated/portal/performance")({
   component: MyPerformance,
@@ -15,17 +17,13 @@ type Note = {
 };
 
 function MyPerformance() {
+  const { user } = useDummyAuth();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const uid = (await supabase.auth.getUser()).data.user?.id ?? "";
-      const { data: s } = await supabase
-        .from("students")
-        .select("id")
-        .eq("user_id", uid)
-        .maybeSingle();
+      const s = await findMyStudent(user?.email);
       if (!s) {
         setLoading(false);
         return;
@@ -33,12 +31,12 @@ function MyPerformance() {
       const { data } = await supabase
         .from("performance_notes")
         .select("*")
-        .eq("student_id", (s as { id: string }).id)
+        .eq("student_id", s.id)
         .order("created_at", { ascending: false });
       setNotes((data ?? []) as Note[]);
       setLoading(false);
     })();
-  }, []);
+  }, [user?.email]);
 
   const avg = notes.length
     ? (notes.reduce((s, n) => s + (n.rating ?? 0), 0) / notes.length).toFixed(1)
