@@ -119,6 +119,90 @@ export type Database = {
           },
         ]
       }
+      batch_coaches: {
+        Row: {
+          assigned_at: string
+          batch_id: string
+          coach_id: string
+          id: string
+        }
+        Insert: {
+          assigned_at?: string
+          batch_id: string
+          coach_id: string
+          id?: string
+        }
+        Update: {
+          assigned_at?: string
+          batch_id?: string
+          coach_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batch_coaches_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batch_schedules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batch_coaches_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      batch_enrollments: {
+        Row: {
+          amount_paid: number | null
+          batch_id: string
+          enrolled_at: string
+          id: string
+          payment_status: string
+          stripe_session_id: string | null
+          student_id: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_paid?: number | null
+          batch_id: string
+          enrolled_at?: string
+          id?: string
+          payment_status?: string
+          stripe_session_id?: string | null
+          student_id: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_paid?: number | null
+          batch_id?: string
+          enrolled_at?: string
+          id?: string
+          payment_status?: string
+          stripe_session_id?: string | null
+          student_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batch_enrollments_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batch_schedules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batch_enrollments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       batch_schedules: {
         Row: {
           active: boolean
@@ -131,6 +215,7 @@ export type Database = {
           end_time: string
           id: string
           location: string | null
+          max_students: number | null
           monthly_fee: number | null
           notes: string | null
           start_time: string
@@ -147,6 +232,7 @@ export type Database = {
           end_time: string
           id?: string
           location?: string | null
+          max_students?: number | null
           monthly_fee?: number | null
           notes?: string | null
           start_time: string
@@ -163,6 +249,7 @@ export type Database = {
           end_time?: string
           id?: string
           location?: string | null
+          max_students?: number | null
           monthly_fee?: number | null
           notes?: string | null
           start_time?: string
