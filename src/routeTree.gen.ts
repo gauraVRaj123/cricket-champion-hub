@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProgramsRouteImport } from './routes/programs'
+import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CoachesRouteImport } from './routes/coaches'
@@ -53,6 +54,11 @@ import { Route as AuthenticatedAdminAttendanceRouteImport } from './routes/_auth
 const ProgramsRoute = ProgramsRouteImport.update({
   id: '/programs',
   path: '/programs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
+  id: '/payment-success',
+  path: '/payment-success',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GalleryRoute = GalleryRouteImport.update({
@@ -280,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/coaches': typeof CoachesRoute
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/programs': typeof ProgramsRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/coach': typeof AuthenticatedCoachRouteWithChildren
@@ -321,6 +328,7 @@ export interface FileRoutesByTo {
   '/coaches': typeof CoachesRoute
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/programs': typeof ProgramsRoute
   '/admin/attendance': typeof AuthenticatedAdminAttendanceRoute
   '/admin/batches': typeof AuthenticatedAdminBatchesRoute
@@ -361,6 +369,7 @@ export interface FileRoutesById {
   '/coaches': typeof CoachesRoute
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/programs': typeof ProgramsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
@@ -404,6 +413,7 @@ export interface FileRouteTypes {
     | '/coaches'
     | '/contact'
     | '/gallery'
+    | '/payment-success'
     | '/programs'
     | '/admin'
     | '/coach'
@@ -445,6 +455,7 @@ export interface FileRouteTypes {
     | '/coaches'
     | '/contact'
     | '/gallery'
+    | '/payment-success'
     | '/programs'
     | '/admin/attendance'
     | '/admin/batches'
@@ -484,6 +495,7 @@ export interface FileRouteTypes {
     | '/coaches'
     | '/contact'
     | '/gallery'
+    | '/payment-success'
     | '/programs'
     | '/_authenticated/admin'
     | '/_authenticated/coach'
@@ -527,6 +539,7 @@ export interface RootRouteChildren {
   CoachesRoute: typeof CoachesRoute
   ContactRoute: typeof ContactRoute
   GalleryRoute: typeof GalleryRoute
+  PaymentSuccessRoute: typeof PaymentSuccessRoute
   ProgramsRoute: typeof ProgramsRoute
 }
 
@@ -537,6 +550,13 @@ declare module '@tanstack/react-router' {
       path: '/programs'
       fullPath: '/programs'
       preLoaderRoute: typeof ProgramsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment-success': {
+      id: '/payment-success'
+      path: '/payment-success'
+      fullPath: '/payment-success'
+      preLoaderRoute: typeof PaymentSuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gallery': {
@@ -922,6 +942,7 @@ const rootRouteChildren: RootRouteChildren = {
   CoachesRoute: CoachesRoute,
   ContactRoute: ContactRoute,
   GalleryRoute: GalleryRoute,
+  PaymentSuccessRoute: PaymentSuccessRoute,
   ProgramsRoute: ProgramsRoute,
 }
 export const routeTree = rootRouteImport
