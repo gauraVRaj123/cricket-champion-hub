@@ -1,115 +1,115 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 
 import { PageHeader } from "@/components/DashboardShell";
 import { useDummyAuth } from "@/hooks/useDummyAuth";
+import {
+  fetchCoachByUser,
+  fetchCoachBatches,
+  fetchPaidStudentsForBatches,
+  fmtTime,
+  type BatchFull,
+} from "@/lib/enrollments";
 
 export const Route = createFileRoute("/_authenticated/coach/")({
   component: CoachDashboard,
 });
 
-type Batch = {
-  id: string;
-  batch_name: string;
-  age_group: string;
-  days: string;
-  start_time: string;
-  end_time: string;
-  location: string | null;
-};
+type CoachRecord = Awaited<ReturnType<typeof fetchCoachByUser>>;
 
-type Coach = {
-  name: string;
-  role: string;
-  certifications: string | null;
-  experience_years: number | null;
-};
+const DAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
-const DUMMY_COACH: Coach = {
-  name: "Coach Demo",
-  role: "coach",
-  certifications: "Level-2 · Fast Bowling",
-  experience_years: 6,
-};
-
-const DUMMY_BATCHES: Batch[] = [
-  {
-    id: "b1",
-    batch_name: "U-16 Talent Track",
-    age_group: "U-16",
-    days: "Tue · Thu",
-    start_time: "17:00",
-    end_time: "19:00",
-    location: "Academy Oval",
-  },
-  {
-    id: "b2",
-    batch_name: "Power Hitting",
-    age_group: "U-12",
-    days: "Mon · Wed · Fri",
-    start_time: "16:00",
-    end_time: "18:00",
-    location: "Wankhede Stadium Training Ground",
-  },
-];
+function runsToday(days: string) {
+  const key = DAY_KEYS[new Date().getDay()];
+  return days.toLowerCase().includes(key);
+}
 
 function CoachDashboard() {
   const { user } = useDummyAuth();
+  const [coach, setCoach] = useState<CoachRecord>(null);
+  const [batches, setBatches] = useState<BatchFull[]>([]);
+  const [studentCount, setStudentCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  const name = useMemo(() => user?.full_name || DUMMY_COACH.name, [user]);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const c = await fetchCoachByUser(user?.id, user?.full_name);
+      const list = c ? await fetchCoachBatches(c.id) : [];
+      const roster = await fetchPaidStudentsForBatches(list.map((b) => b.id));
+      const unique = new Set(roster.map((r) => r.students?.id).filter(Boolean));
+      if (cancelled) return;
+      setCoach(c);
+      setBatches(list);
+      setStudentCount(unique.size);
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, user?.full_name]);
+
+  const todayCount = batches.filter((b) => runsToday(b.days)).length;
 
   return (
     <div>
-      <PageHeader eyebrow="[ Coach ]" title={name} />
+      <PageHeader eyebrow="[ Coach ]" title={coach?.name || user?.full_name || "Coach"} />
       <p className="text-sm text-muted-foreground mb-6">
-        {DUMMY_COACH.role}
-        {DUMMY_COACH.certifications ? ` · ${DUMMY_COACH.certifications}` : ""}
-        {DUMMY_COACH.experience_years ? ` · ${DUMMY_COACH.experience_years}y experience` : ""}
+        {coach
+          ? [
+              coach.role,
+              coach.certifications,
+              coach.experience_years ? `${coach.experience_years}y experience` : null,
+            ]
+              .filter(Boolean)
+              .join(" · ")
+          : "No coach profile linked to your account yet."}
       </p>
 
       <div className="grid sm:grid-cols-3 gap-4 mb-8">
-        <div className="border border-border p-6">
-          <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary mb-2">
-            My Batches
-          </div>
-          <div className="font-display text-4xl">{DUMMY_BATCHES.length}</div>
-        </div>
-
-        <div className="border border-border p-6">
-          <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary mb-2">
-            Students
-          </div>
-          <div className="font-display text-4xl">24</div>
-        </div>
-
-        <div className="border border-border p-6">
-          <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary mb-2">
-            Marked Today
-          </div>
-          <div className="font-display text-4xl">18</div>
-        </div>
-      </div>
-
-      <h2 className="font-display text-2xl mb-3">My Batches</h2>
-      <div className="space-y-3">
-        {DUMMY_BATCHES.map((s) => (
-          <div key={s.id} className="border border-border p-4">
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary">
-              {s.age_group}
+        {[
+          { label: "My Batches", value: batches.length },
+          { label: "My Students", value: studentCount },
+          { label: "Sessions Today", value: todayCount },
+        ].map((s) => (
+          <div key={s.label} className="border border-border p-6">
+            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary mb-2">
+              {s.label}
             </div>
-            <div className="font-display text-xl">{s.batch_name}</div>
-            <div className="text-xs">
-              {s.days} · {s.start_time} – {s.end_time}
-            </div>
-            {s.location ? <div className="text-xs text-muted-foreground">{s.location}</div> : null}
+            <div className="font-display text-4xl">{loading ? "—" : s.value}</div>
           </div>
         ))}
       </div>
 
-      <div className="mt-6 text-xs text-muted-foreground">
-        <Link to="/coach/students" className="text-primary hover:underline inline-block">
-          View student roster →
-        </Link>
+      <h2 className="font-display text-2xl mb-3">My Batches</h2>
+      {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
+      {!loading && batches.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          No batches assigned to you yet. Ask an admin to assign you to a batch.
+        </p>
+      )}
+      <div className="space-y-3">
+        {batches.map((b) => (
+          <Link
+            key={b.id}
+            to="/coach/students"
+            search={{ batch_id: b.id }}
+            className="block border border-border p-4 hover:border-primary transition-colors"
+          >
+            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary">
+              {b.age_group}
+              {b.active ? "" : " · Hidden"}
+            </div>
+            <div className="font-display text-xl">{b.batch_name}</div>
+            <div className="text-xs">
+              {b.days} · {fmtTime(b.start_time)} – {fmtTime(b.end_time)}
+            </div>
+            {b.location ? (
+              <div className="text-xs text-muted-foreground">{b.location}</div>
+            ) : null}
+          </Link>
+        ))}
       </div>
     </div>
   );
